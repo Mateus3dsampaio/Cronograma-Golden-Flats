@@ -1,0 +1,22 @@
+/* Cores, raios, sombras e a base da página (mesma paleta do CRM Eccellenza) */
+:root{
+  --fundo:#0e131a; --coluna:#141c26; --sup:#1a2430; --sup2:#273545; --borda:#263444; --borda2:#2f3f51;
+  --texto:#e6edf4; --suave:#b4bdc8; --fraco:#8f99a5;
+  --marca:#3f74ec; --marca2:#5a89ef; --marca-lado:#254389; --marca-txt:#8aaaf0;
+  --ok:#4fd184; --ok-suave:#14341f; --aviso:#f0b04a; --aviso-suave:#3a2c12; --alerta:#f2766f; --alerta-suave:#3b1c1f;
+  --r-card:16px; --r-ctl:10px;
+  --mola:cubic-bezier(.22,1,.36,1); --salto:cubic-bezier(.34,1.56,.64,1);
+  --s-card:0 1px 2px rgb(0 0 0/.35),0 4px 16px rgb(0 0 0/.3);
+  --s-flut:0 18px 40px rgb(0 0 0/.55),0 4px 10px rgb(0 0 0/.35);
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{font-family:Inter,ui-sans-serif,system-ui,"Segoe UI",sans-serif;background:var(--fundo);color:var(--texto);font-size:14px;line-height:1.45;min-height:100vh;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(60vw 55vh at 0% 0%,color-mix(in srgb,var(--marca) 16%,transparent),transparent 100%),
+  radial-gradient(50vw 50vh at 100% 0%,color-mix(in srgb,var(--marca) 7%,transparent),transparent 100%),
+  linear-gradient(165deg,color-mix(in srgb,var(--sup) 60%,var(--fundo)) 0%,var(--fundo) 55%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(rgb(138 170 240/.09) 1px,transparent 1px);background-size:26px 26px;mask-image:linear-gradient(180deg,#000,transparent 70%);-webkit-mask-image:linear-gradient(180deg,#000,transparent 70%)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--marca-txt);outline-offset:2px}

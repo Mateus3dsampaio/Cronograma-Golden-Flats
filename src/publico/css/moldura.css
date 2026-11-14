@@ -1,0 +1,25 @@
+/* Barra de cima, abas e área das telas */
+.topo{position:sticky;top:0;z-index:30;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:0 28px;background:rgb(14 19 26/.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--borda)}
+.topo::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--marca-txt) 70%,transparent),transparent)}
+.logo{display:flex;align-items:center;gap:12px;min-width:0}
+.logo b{display:block;font-size:14px;font-weight:700;letter-spacing:.3em;white-space:nowrap}
+.logo span{display:block;font-size:11px;color:var(--fraco);letter-spacing:.08em;white-space:nowrap}
+.abas{position:relative;display:flex;gap:2px;padding:4px;border-radius:12px;background:rgb(20 28 38/.8);border:1px solid var(--borda)}
+.abas button{position:relative;z-index:1;height:36px;padding:0 16px;border-radius:9px;font-weight:600;font-size:13px;color:var(--suave);transition:color .2s}
+.abas button:hover{color:var(--texto)}
+.abas button.on{color:#fff}
+.abas i{position:absolute;z-index:0;top:4px;height:36px;border-radius:9px;background:linear-gradient(180deg,color-mix(in srgb,var(--marca) 78%,#000),var(--marca) 55%);box-shadow:inset 0 2px 1.5px rgb(0 0 0/.5),inset 0 -1px 0 rgb(255 255 255/.22),0 0 18px color-mix(in srgb,var(--marca) 45%,transparent);transition:left .42s var(--mola),width .42s var(--mola)}
+.topo-dir{display:flex;justify-content:flex-end;align-items:center;gap:14px;color:var(--fraco);font-size:12px;white-space:nowrap}
+.salvo{display:inline-flex;align-items:center;gap:6px}
+.salvo::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.salvo.pisca::before{animation:pisca .6s var(--mola)}
+@keyframes pisca{0%{transform:scale(2.4)}100%{transform:scale(1)}}
+.demo-faixa{background:linear-gradient(90deg,var(--aviso-suave),#4a3611,var(--aviso-suave));color:var(--aviso);text-align:center;padding:8px;font-weight:600;font-size:13px;border-bottom:1px solid #5a4418}
+.demo-faixa button{margin-left:12px;text-decoration:underline;color:#fff;font-weight:600}
+main{max-width:1440px;margin:0 auto;padding:22px 28px 60px}
+.grade{display:grid;gap:18px}.grade>*{min-width:0}
+.entra>*{animation:subir .6s var(--mola) both}
+.entra>*:nth-child(2){animation-delay:.06s}.entra>*:nth-child(3){animation-delay:.12s}.entra>*:nth-child(4){animation-delay:.18s}.entra>*:nth-child(5){animation-delay:.24s}
+@keyframes subir{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.salvo.salvando::before{background:var(--aviso);box-shadow:0 0 8px var(--aviso)}
+.salvo.erro{color:var(--alerta)}.salvo.erro::before{background:var(--alerta);box-shadow:0 0 8px var(--alerta)}

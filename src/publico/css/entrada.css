@@ -1,0 +1,9 @@
+/* Tela de entrada: esfera de pontos em cima, cartão da senha embaixo */
+.entrada{display:grid;place-content:center;justify-items:center;gap:8px;padding:20px;overflow:hidden}
+.entrada canvas{width:260px;height:260px;filter:drop-shadow(0 0 40px color-mix(in srgb,var(--marca) 60%,transparent));animation:subir .9s var(--mola) both}
+.cartao-entrada{width:min(360px,100%);display:grid;gap:14px;text-align:center;padding:28px;background:linear-gradient(180deg,color-mix(in srgb,var(--marca) 12%,transparent),transparent 80px),rgb(22 31 42/.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:subir .7s var(--mola) .35s both}
+.cartao-entrada b{font-size:18px;letter-spacing:.34em;padding-left:.34em}
+.cartao-entrada>span{font-size:12px;color:var(--fraco);letter-spacing:.08em;margin-top:-8px}
+.cartao-entrada .campo{text-align:left;margin-top:8px}
+.cartao-entrada #erro{color:var(--alerta);font-size:13px;min-height:19px}
+@keyframes subir{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
