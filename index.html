@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golden Flats · Cronograma de montagem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   1. TOKENS (mesma paleta do CRM Eccellenza: azul-ardósia escuro)
+   ===================================================================== */
+:root{
+  --fundo:#0e131a; --coluna:#141c26; --sup:#1a2430; --sup2:#273545; --borda:#263444; --borda2:#2f3f51;
+  --texto:#e6edf4; --suave:#b4bdc8; --fraco:#8f99a5;
+  --marca:#3f74ec; --marca2:#5a89ef; --marca-lado:#254389; --marca-txt:#8aaaf0;
+  --ok:#4fd184; --ok-suave:#14341f; --aviso:#f0b04a; --aviso-suave:#3a2c12; --alerta:#f2766f; --alerta-suave:#3b1c1f;
+  --r-card:16px; --r-ctl:10px;
+  --mola:cubic-bezier(.22,1,.36,1); --salto:cubic-bezier(.34,1.56,.64,1);
+  --s-card:0 1px 2px rgb(0 0 0/.35),0 4px 16px rgb(0 0 0/.3);
+  --s-flut:0 18px 40px rgb(0 0 0/.55),0 4px 10px rgb(0 0 0/.35);
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{font-family:Inter,ui-sans-serif,system-ui,"Segoe UI",sans-serif;background:var(--fundo);color:var(--texto);font-size:14px;line-height:1.45;min-height:100vh;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(60vw 55vh at 0% 0%,color-mix(in srgb,var(--marca) 16%,transparent),transparent 100%),
+  radial-gradient(50vw 50vh at 100% 0%,color-mix(in srgb,var(--marca) 7%,transparent),transparent 100%),
+  linear-gradient(165deg,color-mix(in srgb,var(--sup) 60%,var(--fundo)) 0%,var(--fundo) 55%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(rgb(138 170 240/.09) 1px,transparent 1px);background-size:26px 26px;mask-image:linear-gradient(180deg,#000,transparent 70%);-webkit-mask-image:linear-gradient(180deg,#000,transparent 70%)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--marca-txt);outline-offset:2px}
+
+/* =====================================================================
+   2. MOLDURA: topo, abas, área
+   ===================================================================== */
+.topo{position:sticky;top:0;z-index:30;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:0 28px;background:rgb(14 19 26/.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--borda)}
+.topo::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--marca-txt) 70%,transparent),transparent)}
+.logo{display:flex;align-items:center;gap:12px;min-width:0}
+.logo b{display:block;font-size:14px;font-weight:700;letter-spacing:.3em;white-space:nowrap}
+.logo span{display:block;font-size:11px;color:var(--fraco);letter-spacing:.08em;white-space:nowrap}
+.abas{position:relative;display:flex;gap:2px;padding:4px;border-radius:12px;background:rgb(20 28 38/.8);border:1px solid var(--borda)}
+.abas button{position:relative;z-index:1;height:36px;padding:0 16px;border-radius:9px;font-weight:600;font-size:13px;color:var(--suave);transition:color .2s}
+.abas button:hover{color:var(--texto)}
+.abas button.on{color:#fff}
+.abas i{position:absolute;z-index:0;top:4px;height:36px;border-radius:9px;background:linear-gradient(180deg,color-mix(in srgb,var(--marca) 78%,#000),var(--marca) 55%);box-shadow:inset 0 2px 1.5px rgb(0 0 0/.5),inset 0 -1px 0 rgb(255 255 255/.22),0 0 18px color-mix(in srgb,var(--marca) 45%,transparent);transition:left .42s var(--mola),width .42s var(--mola)}
+.topo-dir{display:flex;justify-content:flex-end;align-items:center;gap:14px;color:var(--fraco);font-size:12px;white-space:nowrap}
+.salvo{display:inline-flex;align-items:center;gap:6px}
+.salvo::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.salvo.pisca::before{animation:pisca .6s var(--mola)}
+@keyframes pisca{0%{transform:scale(2.4)}100%{transform:scale(1)}}
+.demo-faixa{background:linear-gradient(90deg,var(--aviso-suave),#4a3611,var(--aviso-suave));color:var(--aviso);text-align:center;padding:8px;font-weight:600;font-size:13px;border-bottom:1px solid #5a4418}
+.demo-faixa button{margin-left:12px;text-decoration:underline;color:#fff;font-weight:600}
+main{max-width:1440px;margin:0 auto;padding:22px 28px 60px}
+.grade{display:grid;gap:18px}.grade>*{min-width:0}
+.entra>*{animation:subir .6s var(--mola) both}
+.entra>*:nth-child(2){animation-delay:.06s}.entra>*:nth-child(3){animation-delay:.12s}.entra>*:nth-child(4){animation-delay:.18s}.entra>*:nth-child(5){animation-delay:.24s}
+@keyframes subir{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+/* =====================================================================
+   3. PEÇAS: cartão, rótulo, botão, campo, selo
+   ===================================================================== */
+.card{position:relative;background:linear-gradient(180deg,color-mix(in srgb,var(--marca) 9%,transparent),transparent 56px),var(--coluna);border:1px solid var(--borda);border-radius:var(--r-card);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--marca-txt) 30%,transparent),var(--s-card);padding:20px}
+.rot{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--fraco)}
+.card>.rot{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;min-height:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;border-radius:var(--r-ctl);font-weight:600;font-size:13px;background:var(--sup);border:1px solid var(--borda2);box-shadow:0 2px 0 #151d26,0 4px 6px rgb(0 0 0/.4),inset 0 1px 0 rgb(255 255 255/.07);transition:transform .12s var(--mola),box-shadow .12s,background .2s}
+.btn:hover{background:var(--sup2)}
+.btn:active{transform:translateY(2px);box-shadow:0 0 0 #151d26,0 1px 2px rgb(0 0 0/.4)}
+.btn.pri{background:var(--marca);border-color:transparent;color:#fff;box-shadow:0 4px 0 var(--marca-lado),0 7px 10px color-mix(in srgb,var(--marca) 35%,transparent),inset 0 1px 0 rgb(255 255 255/.3)}
+.btn.pri:hover{background:var(--marca2)}
+.btn.pri:active{transform:translateY(4px);box-shadow:0 0 0 var(--marca-lado)}
+.btn.perigo{color:var(--alerta)}
+.btn.mini{height:30px;padding:0 11px;font-size:12px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.campo{display:grid;gap:6px;font-size:12px;color:var(--suave);font-weight:500}
+.campo input,.campo select{height:38px;padding:0 12px;border-radius:var(--r-ctl);background:#0d141f;border:1px solid var(--borda2);color:var(--texto);font-size:14px;width:100%;transition:border-color .2s,box-shadow .2s}
+.campo input:focus,.campo select:focus{outline:0;border-color:var(--marca);box-shadow:0 0 0 3px color-mix(in srgb,var(--marca) 30%,transparent)}
+.seg{display:inline-flex;padding:3px;border-radius:var(--r-ctl);background:#0d141f;border:1px solid var(--borda2)}
+.seg button{height:30px;padding:0 14px;border-radius:7px;font-size:13px;font-weight:600;color:var(--suave);transition:all .2s var(--mola)}
+.seg button.on{background:var(--marca);color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--marca) 50%,transparent)}
+.selo{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.selo.ok{background:var(--ok-suave);color:var(--ok)}.selo.av{background:var(--aviso-suave);color:var(--aviso)}.selo.al{background:var(--alerta-suave);color:var(--alerta)}.selo.nt{background:var(--sup2);color:var(--suave)}.selo.mc{background:#1b2a46;color:var(--marca-txt)}
+.ponto{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
+.mudo{color:var(--fraco)} .dir{text-align:right}
+.barra{height:6px;border-radius:99px;background:var(--sup2);overflow:hidden}
+.barra>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--marca),var(--marca-txt));transition:width .8s var(--mola)}
+.barra.ok>i{background:linear-gradient(90deg,#2fa866,var(--ok))}
+
+/* =====================================================================
+   4. ACOMPANHAMENTO
+   ===================================================================== */
+.veredito{display:flex;align-items:center;gap:16px;padding:14px 20px;border-radius:var(--r-card);border:1px solid;font-size:15px;font-weight:500}
+.veredito b{font-weight:700}
+.veredito .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;font-weight:800;flex:none}
+.veredito.ok{background:linear-gradient(90deg,var(--ok-suave),transparent 80%),var(--coluna);border-color:#1f5a36}.veredito.ok .ic{background:var(--ok);color:#06200f}
+.veredito.av{background:linear-gradient(90deg,var(--aviso-suave),transparent 80%),var(--coluna);border-color:#5a4418}.veredito.av .ic{background:var(--aviso);color:#2a1c02}
+.veredito.al{background:linear-gradient(90deg,var(--alerta-suave),transparent 80%),var(--coluna);border-color:#6a2a2a}.veredito.al .ic{background:var(--alerta);color:#2a0606}
+.veredito.nt{background:linear-gradient(90deg,#1b2a46,transparent 80%),var(--coluna);border-color:#2b4170}.veredito.nt .ic{background:var(--marca);color:#fff}
+.veredito .acoes{margin-left:auto;display:flex;gap:8px;flex:none}
+.avisos{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.topo-painel{grid-template-columns:minmax(380px,1fr) 2fr}
+.heroi{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px;overflow:hidden}
+.heroi canvas{width:230px;height:230px;margin:-8px 0 -8px -14px}
+.heroi .pct{font-size:64px;font-weight:800;letter-spacing:-.04em;line-height:1;background:linear-gradient(180deg,#fff,var(--marca-txt));-webkit-background-clip:text;background-clip:text;color:transparent}
+.heroi .pct small{font-size:26px;font-weight:700}
+.heroi dl{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin-top:14px;font-size:13px}
+.heroi dt{color:var(--suave)} .heroi dd{font-weight:700;text-align:right}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.kpi{display:flex;flex-direction:column;justify-content:space-between;min-height:126px}
+.kpi .v{font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.kpi .v small{font-size:14px;font-weight:600;color:var(--suave);letter-spacing:0;margin-left:4px}
+.kpi .s{color:var(--suave);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.predio{display:grid;gap:5px}
+.pav{display:grid;grid-template-columns:54px 1fr 150px 178px;align-items:center;gap:16px;padding:3px 8px;border-radius:10px;transition:background .2s}
+.pav:hover{background:rgb(255 255 255/.03)}
+.pav .n{font-weight:700;font-size:13px;color:var(--suave)}
+.pav .n small{color:var(--fraco);font-weight:500}
+.cels{display:grid;gap:5px;align-items:center}
+.cel{position:relative;height:30px;border-radius:7px;font-size:11px;font-weight:600;color:var(--fraco);background:#111922;border:1px solid var(--borda);display:grid;place-items:center;transition:transform .18s var(--mola),border-color .2s,background .3s,color .3s;overflow:hidden}
+.cel:hover{transform:translateY(-2px) scale(1.06);border-color:var(--marca-txt);color:#fff;z-index:2}
+.cel.hall{letter-spacing:.14em;font-size:10px}
+.cel.and{color:#fff;border-color:var(--c,var(--marca-txt));background:color-mix(in srgb,var(--c,var(--marca)) 20%,#111922)}
+.cel.and::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 12px var(--c,var(--marca-txt));animation:pulso 1.8s ease-in-out infinite}
+@keyframes pulso{0%,100%{opacity:.25}50%{opacity:1}}
+.cel.ok{color:#d8ffe7;background:linear-gradient(180deg,#24804d,#19603a);border-color:#3bb873;box-shadow:inset 0 1px 0 rgb(255 255 255/.25),0 0 10px rgb(79 209 132/.22)}
+.cel.ok::before{content:"";position:absolute;left:0;bottom:0;height:3px;width:50%;background:#aef5c9}
+.cel.ok.t1::before{left:50%}
+.cel.pop{animation:pop .7s var(--salto)}
+@keyframes pop{0%{transform:scale(.6)}55%{transform:scale(1.28)}100%{transform:scale(1)}}
+.entra .cel{animation:surgecel .5s var(--mola) both;animation-delay:calc(var(--i)*9ms + 150ms)}
+@keyframes surgecel{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+.pav .pg{display:grid;grid-template-columns:1fr 40px;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.pav .pv{font-size:12px;color:var(--suave);text-align:right;white-space:nowrap}
+.pav .pv b{color:var(--texto)}
+.legenda{display:flex;gap:18px;font-size:12px;color:var(--suave);font-weight:500;letter-spacing:0;text-transform:none}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{width:14px;height:10px;border-radius:3px;border:1px solid var(--borda);background:#111922}
+.baixo-painel{grid-template-columns:2fr 1fr}
+.graf svg{display:block;width:100%;overflow:visible}
+.graf .tr{stroke-dasharray:1;stroke-dashoffset:0}
+.entra .graf .tr{animation:traco 1.6s var(--mola) .3s both}
+@keyframes traco{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.rank{display:grid;gap:12px}
+.rank .l{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.rank .pos{font-weight:800;color:var(--fraco);text-align:center}
+.rank .l.um .pos{color:var(--aviso)}
+.rank .nm{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:5px}
+.rank .vl{font-weight:700;text-align:right}
+.rank .vl small{display:block;color:var(--fraco);font-weight:500;font-size:11px}
+
+/* =====================================================================
+   5. CRONOGRAMA (gantt por equipe)
+   ===================================================================== */
+.gantt{overflow:auto;max-height:calc(100vh - 230px);border-radius:12px;border:1px solid var(--borda);background:#0f151d}
+.g-in{position:relative}
+.g-head{position:sticky;top:0;z-index:5;height:52px;background:#121a24;border-bottom:1px solid var(--borda)}
+.g-head .m,.g-head .d{position:absolute;white-space:nowrap}
+.g-head .m{top:6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--marca-txt);padding-left:6px}
+.g-head .d{top:26px;height:26px;font-size:10px;color:var(--fraco);text-align:center;line-height:13px;border-left:1px solid var(--borda)}
+.g-head .d.sg{border-left-color:var(--borda2)}
+.g-head .d.hoje{color:#fff;font-weight:700;background:color-mix(in srgb,var(--marca) 40%,transparent)}
+.g-row{position:relative;height:46px;border-bottom:1px solid rgb(38 52 68/.6)}
+.g-nome{position:sticky;left:0;z-index:4;width:150px;height:100%;display:flex;align-items:center;gap:8px;padding:0 14px;font-weight:600;font-size:13px;background:#121a24;border-right:1px solid var(--borda);white-space:nowrap;overflow:hidden}
+.g-head .g-nome{position:sticky;height:52px;font-size:11px}
+.g-row.fora .g-nome{color:var(--fraco)}
+.blk{position:absolute;top:8px;height:30px;border-radius:7px;font-size:10px;font-weight:700;display:grid;place-items:center;overflow:hidden;white-space:nowrap;border:1px solid var(--borda2);background:var(--sup);color:var(--suave);transition:transform .15s var(--mola)}
+.blk:hover{transform:scaleY(1.12);z-index:3}
+.blk.alt{background:#212d3b}
+.blk.ok{background:linear-gradient(180deg,#24804d,#19603a);border-color:#3bb873;color:#d8ffe7}
+.blk.and{background:color-mix(in srgb,var(--marca) 45%,#111922);border-color:var(--marca-txt);color:#fff;box-shadow:0 0 12px color-mix(in srgb,var(--marca) 50%,transparent)}
+.g-sem{position:absolute;top:52px;bottom:0;width:1px;background:rgb(47 63 81/.55)}
+.g-hoje{position:absolute;top:26px;bottom:0;width:2px;background:var(--marca-txt);box-shadow:0 0 10px var(--marca-txt);z-index:3}
+
+/* =====================================================================
+   6. EQUIPES, SIMULADOR, CLIENTE, CONFIGURAÇÕES
+   ===================================================================== */
+.eqs{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.eq .cab{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.eq .cab b{font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eq.fora{opacity:.6}
+.eq .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.eq .nums div{background:#111922;border:1px solid var(--borda);border-radius:10px;padding:10px 12px}
+.eq .nums b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.eq .nums span{font-size:11px;color:var(--fraco)}
+.eq .agora{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#111922;border:1px solid var(--borda);font-size:13px;margin-bottom:14px;min-height:54px}
+.eq .rod{display:flex;gap:8px;justify-content:flex-end}
+.nova{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:14px;align-items:end}
+.sim{grid-template-columns:minmax(340px,1fr) 2fr;align-items:start}
+.sim .res{margin-top:20px;padding:20px;border-radius:14px;background:#111922;border:1px solid var(--borda);text-align:center}
+.sim .res .g{font-size:76px;font-weight:800;letter-spacing:-.04em;line-height:1;background:linear-gradient(180deg,#fff,var(--marca-txt));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sim .res p{margin-top:8px;color:var(--suave)}
+.sl{display:grid;grid-template-columns:96px 1fr 110px 130px;gap:14px;align-items:center;height:36px;padding:0 10px;border-radius:9px;font-size:13px;font-weight:600}
+.sl.meta{background:color-mix(in srgb,var(--ok) 10%,transparent);box-shadow:inset 0 0 0 1px #1f5a36}
+.sl.atual{background:color-mix(in srgb,var(--marca) 14%,transparent);box-shadow:inset 0 0 0 1px #2b4170}
+.sl .barra{height:10px}
+.sl .barra.al>i{background:linear-gradient(90deg,#a84a45,var(--alerta))}
+.tab{width:100%;border-collapse:collapse}
+.tab th{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--fraco);text-align:left;padding:10px 14px;border-bottom:1px solid var(--borda)}
+.tab td{padding:11px 14px;border-bottom:1px solid rgb(38 52 68/.6);font-size:14px}
+.tab tr:last-child td{border-bottom:0}
+.tab tbody tr{transition:background .2s}.tab tbody tr:hover{background:rgb(255 255 255/.03)}
+.cli-cab{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.cli-cab h2{font-size:22px;letter-spacing:-.01em}
+.cfg{grid-template-columns:1fr 1fr;align-items:start}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form .tudo{grid-column:1/-1}
+.dias{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.dias button{height:54px;border-radius:10px;background:#0d141f;border:1px solid var(--borda2);font-size:12px;font-weight:700;color:var(--fraco);display:grid;place-items:center;align-content:center;gap:2px;transition:all .2s var(--mola)}
+.dias button small{font-weight:500;font-size:10px}
+.dias button.m1{color:var(--aviso);border-color:#5a4418;background:var(--aviso-suave)}
+.dias button.m2{color:#fff;border-color:var(--marca);background:#1b2a46}
+.fer{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.fer .selo button{color:inherit;font-weight:800;margin-left:2px}
+.pavs-cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:10px}
+.pavs-cfg label{display:grid;gap:4px;font-size:11px;color:var(--fraco);font-weight:600}
+.pavs-cfg input{height:36px;text-align:center;border-radius:9px;background:#0d141f;border:1px solid var(--borda2);font-weight:700;width:100%}
+.linha{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* =====================================================================
+   7. FLUTUANTES: janela, dica, aviso
+   ===================================================================== */
+.veu{position:fixed;inset:0;z-index:50;background:rgb(6 9 13/.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:some .25s both}
+@keyframes some{from{opacity:0}}
+.janela{width:min(480px,100%);background:linear-gradient(180deg,color-mix(in srgb,var(--marca) 12%,transparent),transparent 80px),rgb(22 31 42/.96);border:1px solid var(--borda2);border-radius:18px;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--marca-txt) 40%,transparent),var(--s-flut);padding:24px;animation:janela .4s var(--mola) both;display:grid;gap:16px}
+@keyframes janela{from{opacity:0;transform:translateY(18px) scale(.96)}}
+.janela h3{font-size:20px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px}
+.janela h3 small{font-size:13px;font-weight:500;color:var(--fraco)}
+.janela .rod{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:99px;background:#0d141f;border:1px solid var(--borda2);font-size:13px;font-weight:600;color:var(--suave);transition:all .2s var(--mola)}
+.chips button.on{color:#fff;border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,#0d141f);box-shadow:0 0 14px color-mix(in srgb,var(--c) 40%,transparent)}
+.dica{position:fixed;z-index:60;pointer-events:none;padding:8px 11px;border-radius:9px;background:rgb(10 14 20/.95);border:1px solid var(--borda2);box-shadow:var(--s-flut);font-size:12px;white-space:pre-line;max-width:260px;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s var(--mola)}
+.dica.on{opacity:1;transform:none}
+.toasts{position:fixed;right:24px;bottom:24px;z-index:70;display:grid;gap:10px}
+.toast{padding:12px 16px;border-radius:12px;background:rgb(10 14 20/.95);border:1px solid var(--borda2);border-left:3px solid var(--ok);box-shadow:var(--s-flut);font-size:13px;font-weight:500;animation:toast .45s var(--mola) both;max-width:360px}
+.toast.sai{animation:toastsai .3s both}
+@keyframes toast{from{opacity:0;transform:translateX(30px)}}
+@keyframes toastsai{to{opacity:0;transform:translateX(30px)}}
+
+@media (max-width:1100px){
+  .topo{grid-template-columns:1fr;height:auto;padding:10px 14px;gap:8px}.topo-dir{display:none}
+  .abas{overflow-x:auto}.abas button{padding:0 12px;white-space:nowrap}
+  main{padding:14px}
+  .topo-painel,.baixo-painel,.sim,.cfg,.nova{grid-template-columns:1fr}
+  .pav{grid-template-columns:40px 1fr;gap:8px}.pav .pg,.pav .pv{display:none}
+  .cel{font-size:0;height:22px}.cel.hall{font-size:0}
+  .veredito{flex-wrap:wrap}.veredito .acoes{margin-left:0}
+  .sl{grid-template-columns:70px 1fr 90px}.sl>:last-child{display:none}
+}
+@media (max-width:640px){.kpis,.form{grid-template-columns:1fr}.heroi{grid-template-columns:1fr;justify-items:center;text-align:center}.heroi canvas{margin:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media print{
+  body{background:#fff;color:#111}body::before,body::after,.topo,.demo-faixa,.toasts,.nao-imp{display:none!important}
+  main{padding:0;max-width:none}.card{background:#fff;border:0;box-shadow:none;padding:0}
+  .tab th,.tab td{color:#111;border-color:#ccc}.mudo,.rot{color:#555}.selo{background:none!important;color:#111!important;padding:0}
+  .barra{background:#ddd}.barra>i{background:#333!important}
+}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="logo"><canvas id="logo-esfera" width="72" height="72" style="width:36px;height:36px"></canvas><div><b id="nome-obra">GOLDEN FLATS</b><span>Cronograma de montagem · Eccellenza</span></div></div>
+  <nav class="abas" id="abas"><i></i>
+    <button data-aba="acomp">Acompanhamento</button><button data-aba="crono">Cronograma</button><button data-aba="equipes">Equipes</button>
+    <button data-aba="simul">Simulador</button><button data-aba="cliente">Cliente</button><button data-aba="config">Configurações</button>
+  </nav>
+  <div class="topo-dir"><span id="hoje-txt"></span><span class="salvo" id="salvo">Salvo neste navegador</span></div>
+</header>
+<div id="demo-faixa"></div>
+<main id="tela"></main>
+<div id="flut"></div>
+<div class="dica" id="dica"></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   A. UTILITÁRIOS
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dn = s => { const [y, m, d] = s.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 864e5); }; // dia -> número
+const dnIso = n => new Date(n * 864e5).toISOString().slice(0, 10);
+const dsem = s => new Date(dn(s) * 864e5).getUTCDay();
+const DS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const fData = s => s ? s.slice(8) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) : '—';
+const fCurta = s => s.slice(8) + '/' + s.slice(5, 7);
+const fSem = s => DS[dsem(s)] + ', ' + fCurta(s);
+const TURNO = ['manhã', 'tarde'];
+const num = (v, dec = 0) => v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+const plural = (n, a, b) => n + ' ' + (Math.abs(n) === 1 ? a : b);
+const CORES = ['#7ba3f0', '#4fd184', '#b697ee', '#f0a06a', '#4cc9ae', '#f08a8d', '#f2c84b', '#6cc7f5', '#e58fd0', '#a3d36a'];
+const cor = e => CORES[(e.cor ?? 0) % CORES.length];
+/** Hoje e o turno atual. `?hoje=2027-01-15` na barra de endereço simula outra data (para testar). */
+function agora() {
+  const q = new URLSearchParams(location.search).get('hoje'), d = new Date();
+  const hoje = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  return { d: q || hoje, t: q ? 1 : (d.getHours() < 12 ? 0 : 1) };
+}
+
+/* =====================================================================
+   B. ESTADO E GRAVAÇÃO (fica só neste navegador: localStorage)
+   ===================================================================== */
+const CHAVE = 'golden-flats-cronograma-v1';
+function estadoPadrao() {
+  let ini = dn(agora().d); while (new Date(ini * 864e5).getUTCDay() !== 1) ini++; // próxima segunda
+  return {
+    v: 1, conferido: false, backupEm: null, seq: 5,
+    cfg: {
+      nome: 'Golden Flats', inicio: dnIso(ini), prazo: '',
+      aptoDias: 2,
+      hallDias: 1,            // PROVISÓRIO: o Mateus ainda não definiu quanto leva um hall
+      ordem: 'asc',           // asc = de baixo para cima
+      semana: [0, 2, 2, 2, 2, 2, 0], // dom..sáb: 0 não trabalha, 1 só manhã, 2 dia inteiro
+      feriados: [], margemCliente: 0, base: 'real',
+    },
+    // PROVISÓRIO: 232 aptos em 17 pavimentos (11 com 14 + 6 com 13). O Mateus corrige em Configurações.
+    pavs: Array.from({ length: 17 }, (_, i) => ({ n: i + 1, q: i < 11 ? 14 : 13 })),
+    equipes: [1, 2, 3, 4].map(i => ({ id: 'e' + i, nome: 'Equipe ' + i, tipo: 'fixa', cor: i - 1, ativa: true, entrada: '', pausas: [] })),
+    feitos: {},  // id da unidade -> { d: data, t: 0 manhã | 1 tarde, e: id da equipe }
+    fixos: {},   // id da unidade -> id da equipe (unidade reservada para uma equipe)
+  };
+}
+function carregar() {
+  try { const s = JSON.parse(localStorage.getItem(CHAVE)); if (s && s.cfg && s.pavs && s.equipes) return s; } catch (e) { }
+  return estadoPadrao();
+}
+let S = carregar(), DEMO = false;
+function salvar() {
+  if (DEMO) return;
+  try { localStorage.setItem(CHAVE, JSON.stringify(S)); } catch (e) { toast('Não consegui salvar neste navegador. Faça um backup em Configurações.', true); }
+  const el = $('#salvo'); el.classList.remove('pisca'); void el.offsetWidth; el.classList.add('pisca');
+}
+
+/* =====================================================================
+   C. CALENDÁRIO: a obra é contada em TURNOS (manhã / tarde) de dias trabalhados
+   ===================================================================== */
+function criarCalendario(S) {
+  const fer = new Set(S.cfg.feriados);
+  let semana = S.cfg.semana; if (!semana.some(x => x)) semana = [0, 2, 2, 2, 2, 2, 0];
+  let base = dn(S.cfg.inicio);
+  for (const k in S.feitos) base = Math.min(base, dn(S.feitos[k].d));
+  const slots = [], ords = [];
+  for (let n = base; n < base + 1800; n++) {
+    const d = dnIso(n), m = fer.has(d) ? 0 : semana[new Date(n * 864e5).getUTCDay()];
+    if (m >= 1) { slots.push({ d, t: 0 }); ords.push(n * 2); }
+    if (m === 2) { slots.push({ d, t: 1 }); ords.push(n * 2 + 1); }
+  }
+  const lb = o => { let a = 0, b = ords.length; while (a < b) { const m = (a + b) >> 1; ords[m] < o ? a = m + 1 : b = m; } return a; };
+  return {
+    slots, porSemana: semana.reduce((a, b) => a + b, 0),
+    ini: (d, t = 0) => lb(dn(d) * 2 + t),        // instante em que o turno (d,t) começa
+    fim: (d, t = 1) => lb(dn(d) * 2 + t + 1),    // instante em que o turno (d,t) termina
+    em: T => slots[Math.max(0, Math.min(slots.length - 1, Math.ceil(T - 1e-6) - 1))], // turno em que o instante T cai
+  };
+}
+
+/* =====================================================================
+   D. MOTOR DE PREVISÃO
+   ===================================================================== */
+const PESO_PLANO = 2; // nas primeiras unidades a previsão ainda pesa o planejado (2 aptos de "crédito")
+
+/** Junta tudo o que a previsão precisa: unidades, o que foi feito, ritmo de cada equipe. */
+function contexto(S) {
+  const cal = criarCalendario(S), A = S.cfg.aptoDias * 2, H = S.cfg.hallDias * 2;
+  const pavs = [...S.pavs].sort((a, b) => S.cfg.ordem === 'asc' ? a.n - b.n : b.n - a.n);
+  const unidades = [];
+  for (const p of pavs) {
+    for (let k = 1; k <= p.q; k++) unidades.push({ id: p.n + '-' + k, pav: p.n, tipo: 'apto', nome: p.n + String(k).padStart(2, '0'), peso: 1 });
+    unidades.push({ id: p.n + '-H', pav: p.n, tipo: 'hall', nome: 'Hall ' + p.n + 'º', peso: H / A });
+  }
+  const porId = new Map(unidades.map(u => [u.id, u]));
+  const ag = agora(), now = cal.ini(ag.d, ag.t), T0 = cal.ini(S.cfg.inicio, 0);
+  const feito = new Map();
+  for (const id in S.feitos) if (porId.has(id)) { const f = S.feitos[id]; feito.set(id, { ...f, T: cal.fim(f.d, f.t) }); }
+  const st = {}; let somaT = 0, somaP = 0;
+  for (const e of S.equipes) {
+    const ini0 = Math.max(T0, e.entrada ? cal.ini(e.entrada, 0) : 0);
+    const lista = [...feito].filter(([, f]) => f.e === e.id).map(([id, f]) => ({ u: porId.get(id), T: f.T })).sort((a, b) => a.T - b.T);
+    const peso = lista.reduce((s, x) => s + x.u.peso, 0), ultimo = lista.length ? lista[lista.length - 1].T : 0;
+    let parado = 0, voltou = 0;
+    for (const p of e.pausas || []) {
+      const a = cal.ini(p.de, 0), b = p.ate ? cal.ini(p.ate, 0) : Infinity;
+      parado += Math.max(0, Math.min(b, ultimo) - Math.max(a, ini0));
+      if (p.ate) voltou = Math.max(voltou, b);
+    }
+    const gasto = peso ? Math.max(peso, ultimo - ini0 - parado) : 0; // turnos trabalhados até a última conclusão
+    somaT += gasto; somaP += peso;
+    st[e.id] = { ini0, lista, peso, ultimo, gasto, bruto: peso ? gasto / peso : null, livre: Math.max(ini0, ultimo, voltou), aptos: lista.filter(x => x.u.tipo === 'apto').length, halls: lista.filter(x => x.u.tipo === 'hall').length };
+  }
+  const ritmoGeral = (PESO_PLANO * A + somaT) / (PESO_PLANO + somaP);
+  for (const e of S.equipes) { const s = st[e.id]; s.ritmo = s.peso ? (PESO_PLANO * A + s.gasto) / (PESO_PLANO + s.peso) : ritmoGeral; }
+  return { cal, A, H, unidades, porId, feito, st, now, T0, ag, ritmoGeral, brutoGeral: somaP ? somaT / somaP : null, ativos: S.equipes.filter(e => e.ativa), iniciou: ag.d >= S.cfg.inicio };
+}
+
+/**
+ * Distribui o que falta entre as equipes, na ordem dos pavimentos: quem fica livre primeiro pega a próxima unidade.
+ * lista = [{ id, ritmo (turnos por apto), livre (instante em que começou a unidade atual) }]
+ */
+function prever(c, lista, fixos) {
+  const fila = c.unidades.filter(u => !c.feito.has(u.id));
+  const plano = new Map();
+  if (!fila.length) { let f = 0; c.feito.forEach(x => f = Math.max(f, x.T)); return { plano, fimT: f, pronto: true }; }
+  if (!lista.length) return null;
+  const reserva = {}, livres = [];
+  for (const u of fila) { const e = fixos[u.id]; if (e && lista.some(x => x.id === e)) (reserva[e] = reserva[e] || []).push(u); else livres.push(u); }
+  const eqs = lista.map(x => ({ ...x, t: x.livre, primeira: true }));
+  let resta = fila.length, i = 0, fimT = 0;
+  while (resta > 0) {
+    let b = null; for (const e of eqs) if (!e.fora && (!b || e.t < b.t)) b = e;
+    if (!b) break;
+    const u = (reserva[b.id] && reserva[b.id].shift()) || livres[i++];
+    if (!u) { b.fora = true; continue; }
+    let fim = b.t + b.ritmo * u.peso;
+    if (b.primeira) { fim = Math.max(fim, c.now + 1); b.primeira = false; } // a unidade em andamento não termina no passado
+    plano.set(u.id, { u, eq: b.id, ini: b.t, fim }); b.t = fim; fimT = Math.max(fimT, fim); resta--;
+  }
+  return { plano, fimT };
+}
+
+/** Previsão com N equipes: mantém as mais rápidas de hoje e completa com equipes novas no ritmo médio da obra. */
+function preverComN(c, S, N, entrada, base) {
+  const ord = [...c.ativos].sort((a, b) => c.st[a.id].ritmo - c.st[b.id].ritmo).slice(0, N);
+  const lista = ord.map(e => ({ id: e.id, ritmo: base === 'plano' ? c.A : c.st[e.id].ritmo, livre: c.st[e.id].livre }));
+  const quando = Math.max(c.now, c.T0, entrada ? c.cal.ini(entrada, 0) : 0);
+  for (let i = lista.length; i < N; i++) lista.push({ id: 'nova' + i, ritmo: base === 'plano' ? c.A : c.ritmoGeral, livre: quando });
+  return prever(c, lista, S.fixos);
+}
+function equipesPara(c, S, alvo, entrada, base) {
+  const alvoT = c.cal.fim(alvo, 1);
+  for (let N = 1; N <= 60; N++) { const p = preverComN(c, S, N, entrada, base); if (p && p.fimT <= alvoT + 1e-6) return N; }
+  return null;
+}
+
+/** Calcula tudo o que as telas mostram. */
+let R = null;
+function calcular() {
+  const c = contexto(S), base = S.cfg.base;
+  const lista = c.ativos.map(e => ({ id: e.id, ritmo: base === 'plano' ? c.A : c.st[e.id].ritmo, livre: c.st[e.id].livre }));
+  const prev = prever(c, lista, S.fixos);
+  const tot = c.unidades.length, feitas = c.feito.size;
+  const aptosTot = c.unidades.filter(u => u.tipo === 'apto').length, aptosFeitos = [...c.feito.keys()].filter(id => c.porId.get(id).tipo === 'apto').length;
+  const hallsTot = tot - aptosTot, hallsFeitos = feitas - aptosFeitos;
+  const pesoResta = c.unidades.reduce((s, u) => s + (c.feito.has(u.id) ? 0 : u.peso), 0);
+  // equipe -> unidade em que está agora
+  const atual = {};
+  if (prev) prev.plano.forEach(p => { if (!atual[p.eq] || p.ini < atual[p.eq].ini) atual[p.eq] = p; });
+  const emAnd = new Map(); if (c.iniciou) for (const e in atual) emAnd.set(atual[e].u.id, e);
+  // pavimentos
+  const pav = {};
+  for (const p of S.pavs) pav[p.n] = { n: p.n, tot: 0, feitos: 0, fimT: 0, and: false, incerto: false };
+  for (const u of c.unidades) {
+    const p = pav[u.pav]; p.tot++;
+    if (c.feito.has(u.id)) { p.feitos++; p.fimT = Math.max(p.fimT, c.feito.get(u.id).T); }
+    else if (prev && prev.plano.has(u.id)) { p.fimT = Math.max(p.fimT, prev.plano.get(u.id).fim); if (emAnd.has(u.id)) p.and = true; }
+    else p.incerto = true;
+  }
+  const liberados = Object.values(pav).filter(p => p.feitos === p.tot).length;
+  const proximo = Object.values(pav).filter(p => p.feitos < p.tot && !p.incerto).sort((a, b) => a.fimT - b.fimT)[0];
+  const fim = prev && (prev.pronto || prev.plano.size) ? c.cal.em(prev.fimT) : null;
+  const prazo = S.cfg.prazo, atraso = fim && prazo ? dn(fim.d) - dn(prazo) : null;
+  // próximo dia de trabalho depois de hoje (quando uma equipe nova poderia começar)
+  let prox = c.cal.slots[c.cal.ini(dnIso(dn(c.ag.d) + 1), 0)].d; if (prox < S.cfg.inicio) prox = S.cfg.inicio;
+  const precisa = prazo && feitas < tot ? equipesPara(c, S, prazo, prox, base) : null;
+  // ritmo recente (últimos 10 dias trabalhados) e ritmo necessário, em aptos por semana
+  const jan = Math.min(c.cal.porSemana * 2, c.now - c.T0);
+  let rec = 0; c.feito.forEach((f, id) => { if (f.T > c.now - jan) rec += c.porId.get(id).peso; });
+  const ritmoRec = jan > 0 && feitas ? rec / jan * c.cal.porSemana : null;
+  const turnosAtePrazo = prazo ? c.cal.fim(prazo, 1) - c.now : null;
+  const ritmoNec = prazo && feitas < tot ? (turnosAtePrazo > 0 ? pesoResta / turnosAtePrazo * c.cal.porSemana : Infinity) : null;
+  const capacidade = c.ativos.reduce((s, e) => s + c.cal.porSemana / (base === 'plano' ? c.A : c.st[e.id].ritmo), 0);
+  // equipes sem concluir nada há tempo demais
+  const paradas = c.iniciou ? c.ativos.filter(e => atual[e.id] && c.now - c.st[e.id].livre > c.st[e.id].ritmo * 1.5 + 1).map(e => ({ e, dias: Math.floor((c.now - c.st[e.id].livre) / 2) })) : [];
+  R = { c, prev, tot, feitas, aptosTot, aptosFeitos, hallsTot, hallsFeitos, pct: tot ? feitas / tot * 100 : 0, pesoResta, atual, emAnd, pav, liberados, proximo, fim, prazo, atraso, prox, precisa, ritmoRec, ritmoNec, capacidade, turnosAtePrazo, paradas };
+  return R;
+}
+
+/* =====================================================================
+   E. AÇÕES (mudam o estado, gravam e redesenham)
+   ===================================================================== */
+function aplicar(msgFn, popId) {
+  const antes = R && R.fim ? R.fim.d : null;
+  salvar(); desenhar(false);
+  if (popId) { const el = $(`[data-u="${popId}"]`); if (el) el.classList.add('pop'); }
+  if (msgFn) {
+    let m = msgFn();
+    if (antes && R.fim && R.fim.d !== antes) { const d = dn(R.fim.d) - dn(antes); m += `<br><span class="mudo">Previsão de término: ${fData(R.fim.d)} (${d > 0 ? '+' : ''}${plural(d, 'dia', 'dias')})</span>`; }
+    toast(m);
+  }
+}
+const acoes = {
+  concluir(id, d, t, e) { S.feitos[id] = { d, t, e }; delete S.fixos[id]; fecharJanela(); aplicar(() => `<b>${esc(R.c.porId.get(id).nome)}</b> concluído · ${fCurta(d)} ${TURNO[t]}`, id); },
+  desfazer(id) { delete S.feitos[id]; fecharJanela(); aplicar(() => `Conclusão de <b>${esc(R.c.porId.get(id).nome)}</b> desfeita`); },
+  reservar(id, e) { if (e) S.fixos[id] = e; else delete S.fixos[id]; fecharJanela(); aplicar(() => e ? `<b>${esc(R.c.porId.get(id).nome)}</b> reservado para ${esc(eq(e).nome)}` : 'Reserva retirada'); },
+  novaEquipe(nome, tipo, entrada) {
+    const usadas = new Set(S.equipes.map(e => e.cor)); let c = 0; while (usadas.has(c) && c < CORES.length) c++;
+    S.equipes.push({ id: 'e' + (S.seq++), nome: nome || 'Equipe ' + (S.equipes.length + 1), tipo, cor: c % CORES.length, ativa: true, entrada, pausas: [] });
+    aplicar(() => `Equipe <b>${esc(nome)}</b> entrou na obra. Cronograma reorganizado.`);
+  },
+  retirar(id) {
+    const e = eq(id), temHist = Object.values(S.feitos).some(f => f.e === id);
+    for (const u in S.fixos) if (S.fixos[u] === id) delete S.fixos[u];
+    if (temHist) { e.ativa = false; (e.pausas = e.pausas || []).push({ de: agora().d, ate: null }); }
+    else S.equipes = S.equipes.filter(x => x.id !== id);
+    fecharJanela(); aplicar(() => `<b>${esc(e.nome)}</b> saiu da obra. Cronograma reorganizado.`);
+  },
+  reativar(id) { const e = eq(id); e.ativa = true; const p = (e.pausas || []).find(p => !p.ate); if (p) p.ate = agora().d; aplicar(() => `<b>${esc(e.nome)}</b> voltou para a obra.`); },
+  editarEquipe(id, nome, tipo, entrada) { const e = eq(id); e.nome = nome || e.nome; e.tipo = tipo; e.entrada = entrada; fecharJanela(); aplicar(); },
+};
+const eq = id => S.equipes.find(e => e.id === id);
+
+/* =====================================================================
+   F. ESFERA DE PONTOS: cada ponto é uma unidade; acende quando é concluída
+   ===================================================================== */
+const OURO = Math.PI * (3 - Math.sqrt(5));
+function esferaPontos(n) { return Array.from({ length: n }, (_, i) => { const y = 1 - (2 * (i + .5)) / n, r = Math.sqrt(1 - y * y), a = i * OURO; return { x: Math.cos(a) * r, y, z: Math.sin(a) * r }; }); }
+const Esfera = {
+  cv: null, pts: [], alvo: [], luz: [], ang: .6, mx: 0, my: 0,
+  criar() {
+    this.cv = document.createElement('canvas'); const dpr = Math.min(devicePixelRatio || 1, 2);
+    this.cv.width = this.cv.height = 230 * dpr; this.ctx = this.cv.getContext('2d'); this.ctx.scale(dpr, dpr);
+    this.cv.addEventListener('pointermove', e => { const r = this.cv.getBoundingClientRect(); this.mx = (e.clientX - r.left) / r.width - .5; this.my = (e.clientY - r.top) / r.height - .5; });
+    this.cv.addEventListener('pointerleave', () => { this.mx = this.my = 0; });
+    const parado = matchMedia('(prefers-reduced-motion: reduce)').matches; let ult = 0, ix = 0, iy = 0;
+    const passo = t => {
+      requestAnimationFrame(passo);
+      if (!this.cv.isConnected || t - ult < 30) return;
+      const dt = ult ? Math.min(.1, (t - ult) / 1000) : 0; ult = t;
+      if (!parado) this.ang += dt * .22;
+      ix += (this.mx - ix) * .08; iy += (this.my - iy) * .08;
+      for (let i = 0; i < this.luz.length; i++) this.luz[i] += (this.alvo[i] - this.luz[i]) * (parado ? 1 : Math.min(1, dt * 3));
+      this.desenhar(this.ang + ix * 1.2, .3 + iy * .8, t / 1000);
+    };
+    requestAnimationFrame(passo);
+  },
+  /** estados: lista por unidade, de baixo para cima (0 a fazer, 1 em andamento, 2 concluída) */
+  definir(estados) {
+    const n = estados.length;
+    if (this.pts.length !== n) { this.pts = esferaPontos(n); this.luz = new Array(n).fill(0); }
+    this.alvo = estados.map((_, i) => estados[n - 1 - i]); // o ponto 0 fica no topo: o último pavimento
+  },
+  desenhar(ang, inc, t) {
+    const c = this.ctx, S2 = 230, m = S2 / 2, raio = S2 * .4, cos = Math.cos(ang), sin = Math.sin(ang), ci = Math.cos(inc), si = Math.sin(inc);
+    c.clearRect(0, 0, S2, S2);
+    const pr = this.pts.map((p, i) => { const x = p.x * cos + p.z * sin, z0 = -p.x * sin + p.z * cos; return { x, y: p.y * ci - z0 * si, z: p.y * si + z0 * ci, l: this.luz[i] }; }).sort((a, b) => a.z - b.z);
+    for (const p of pr) {
+      const f = (p.z + 1) / 2, px = m + p.x * raio, py = m - p.y * raio, feito = Math.max(0, p.l - 1), and = Math.min(1, p.l) * (1 - feito);
+      if (feito > .05) { c.globalAlpha = (.1 + .16 * f) * feito; c.fillStyle = '#4fd184'; c.beginPath(); c.arc(px, py, 3 + 4 * f, 0, 7); c.fill(); }
+      c.globalAlpha = (.25 + .75 * f) * (.45 + .55 * Math.max(feito, and * (.6 + .4 * Math.sin(t * 3 + px))));
+      c.fillStyle = feito > .5 ? '#8ff0b5' : and > .5 ? '#8aaaf0' : '#52647c';
+      c.beginPath(); c.arc(px, py, (.8 + 1.3 * f) * (1 + .5 * feito + .3 * and), 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+  },
+};
+function logoEsfera() {
+  const cv = $('#logo-esfera'), c = cv.getContext('2d'), pts = esferaPontos(84); let ang = .9, ult = 0;
+  const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const des = () => { c.clearRect(0, 0, 72, 72); const cos = Math.cos(ang), sin = Math.sin(ang); c.fillStyle = '#8aaaf0';
+    pts.map(p => ({ x: p.x * cos + p.z * sin, y: p.y * .95 - (-p.x * sin + p.z * cos) * .31, z: p.y * .31 + (-p.x * sin + p.z * cos) * .95 })).sort((a, b) => a.z - b.z)
+      .forEach(p => { const f = (p.z + 1) / 2; c.globalAlpha = .28 + .72 * f; c.beginPath(); c.arc(36 + p.x * 32, 36 + p.y * 32, 1.2 + 2.6 * f, 0, 7); c.fill(); }); };
+  const passo = t => { requestAnimationFrame(passo); if (t - ult < 33) return; ang += ult ? (t - ult) / 1000 * .28 : 0; ult = t; des(); };
+  parado ? des() : requestAnimationFrame(passo);
+}
+
+/* =====================================================================
+   G. TELAS
+   ===================================================================== */
+let aba = 'acomp';
+const sim = { alvo: '', entrada: '' };
+const telas = {};
+const seloAtraso = a => a == null ? '' : a > 0 ? `<span class="selo al">${plural(a, 'dia', 'dias')} de atraso</span>` : a < 0 ? `<span class="selo ok">${plural(-a, 'dia', 'dias')} adiantado</span>` : `<span class="selo ok">no prazo</span>`;
+const diasApto = t => num(t / 2, 1);
+
+/* ---------- G1. Acompanhamento ---------- */
+telas.acomp = () => {
+  const { c, prev } = R, n = c.ativos.length;
+  // veredito em uma frase
+  let v;
+  if (R.feitas === R.tot && R.tot) v = { k: 'ok', ic: '✓', t: `<b>Montagem concluída</b> em ${fData(R.fim.d)}. ${R.atraso != null ? (R.atraso > 0 ? `${plural(R.atraso, 'dia', 'dias')} depois do prazo.` : 'Dentro do prazo.') : ''}` };
+  else if (!n) v = { k: 'al', ic: '!', t: '<b>Nenhuma equipe ativa.</b> Cadastre ou reative uma equipe para ter previsão.' };
+  else if (!R.prazo) v = { k: 'nt', ic: 'i', t: `No ritmo ${S.cfg.base === 'plano' ? 'planejado' : 'atual'}, com <b>${plural(n, 'equipe', 'equipes')}</b>, a montagem termina em <b>${fData(R.fim.d)}</b>. Informe o prazo combinado em Configurações para eu dizer se está adiantado ou atrasado.` };
+  else if (R.atraso > 0) v = { k: R.atraso > 7 ? 'al' : 'av', ic: '!', t: `No ritmo ${S.cfg.base === 'plano' ? 'planejado' : 'atual'} a montagem termina em <b>${fData(R.fim.d)}</b>: <b>${plural(R.atraso, 'dia', 'dias')} depois do prazo</b> (${fData(R.prazo)}). ${R.precisa ? `Para cumprir o prazo: <b>${plural(R.precisa, 'equipe', 'equipes')}</b> (${R.precisa > n ? '+' + (R.precisa - n) : 'as mesmas de hoje'}) a partir de ${fSem(R.prox)}.` : 'Nem com 60 equipes dá para cumprir esse prazo.'}` };
+  else v = { k: 'ok', ic: '✓', t: `No ritmo ${S.cfg.base === 'plano' ? 'planejado' : 'atual'} a montagem termina em <b>${fData(R.fim.d)}</b>: ${R.atraso < 0 ? `<b>${plural(-R.atraso, 'dia', 'dias')} antes do prazo</b>` : '<b>em cima do prazo</b>'} (${fData(R.prazo)}). ${R.precisa && R.precisa < n ? `O prazo fecha até com <b>${plural(R.precisa, 'equipe', 'equipes')}</b> (hoje são ${n}).` : R.precisa === n ? 'Sem folga de equipe: não dá para tirar nenhuma.' : ''}` };
+  const avisos = [];
+  if (!S.conferido && !DEMO) avisos.push(`<span class="selo av">Confira data de início, prazo e pavimentos em Configurações</span>`);
+  for (const p of R.paradas) avisos.push(`<span class="selo al">${esc(p.e.nome)}: ${plural(p.dias, 'dia útil', 'dias úteis')} sem concluir (${esc(R.atual[p.e.id].u.nome)})</span>`);
+  if (!DEMO && R.feitas > 5 && (!S.backupEm || dn(c.ag.d) - dn(S.backupEm) > 7)) avisos.push(`<span class="selo av">${S.backupEm ? 'Último backup há ' + (dn(c.ag.d) - dn(S.backupEm)) + ' dias' : 'Você ainda não fez backup'}</span>`);
+  // prédio
+  const maxQ = Math.max(1, ...S.pavs.map(p => p.q)); let i = 0;
+  const linhas = [...S.pavs].sort((a, b) => b.n - a.n).map(p => {
+    const info = R.pav[p.n], us = c.unidades.filter(u => u.pav === p.n), pc = info.tot ? info.feitos / info.tot * 100 : 0;
+    const cel = u => {
+      const f = c.feito.get(u.id), e = R.emAnd.get(u.id), pl = prev && prev.plano.get(u.id), rot = u.tipo === 'hall' ? 'HALL' : u.nome;
+      let cls = 'cel' + (u.tipo === 'hall' ? ' hall' : ''), est = '', dica;
+      if (f) { cls += ' ok t' + f.t; dica = `${u.nome}\nConcluído ${fSem(f.d)} · ${TURNO[f.t]}\n${eq(f.e) ? eq(f.e).nome : ''}`; }
+      else if (e) { cls += ' and'; est = `style="--c:${cor(eq(e))};--i:${i}"`; const s = c.cal.em(pl.fim); dica = `${u.nome}\nEm montagem · ${eq(e).nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}`; }
+      else if (pl) { const s = c.cal.em(pl.fim), q = eq(pl.eq); dica = `${u.nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}\n${q ? q.nome : ''}${S.fixos[u.id] ? ' (reservado)' : ''}`; }
+      else dica = `${u.nome}\nSem previsão`;
+      return `<button class="${cls}" ${est || `style="--i:${i++}"`} data-a="unidade" data-u="${u.id}" data-dica="${esc(dica)}">${rot}</button>`;
+    };
+    const aptos = us.filter(u => u.tipo === 'apto'), hall = us.find(u => u.tipo === 'hall');
+    const s = info.fimT ? c.cal.em(info.fimT) : null;
+    const pv = info.feitos === info.tot ? `<span class="selo ok">✓ Liberado ${fCurta(s.d)}</span>` : info.incerto || !s ? '<span class="mudo">sem previsão</span>' : `libera <b>${fSem(s.d)}</b> · ${TURNO[s.t]}`;
+    return `<div class="pav"><div class="n">${p.n}º <small>pav</small></div>
+      <div class="cels" style="grid-template-columns:repeat(${maxQ},minmax(0,1fr)) 6px minmax(0,1.5fr)">${aptos.map(cel).join('')}${'<span></span>'.repeat(maxQ - aptos.length + 1)}${cel(hall)}</div>
+      <div class="pg"><div class="barra ${pc === 100 ? 'ok' : ''}"><i style="width:${pc}%"></i></div><span class="dir">${num(pc)}%</span></div>
+      <div class="pv">${pv}</div></div>`;
+  }).join('');
+  // ranking
+  const rk = S.equipes.filter(e => c.st[e.id].peso > 0).sort((a, b) => c.st[a.id].bruto - c.st[b.id].bruto);
+  const pior = Math.max(c.A, ...rk.map(e => c.st[e.id].bruto));
+  const rank = rk.length ? rk.map((e, k) => { const s = c.st[e.id]; return `<div class="l ${k === 0 ? 'um' : ''}"><div class="pos">${k === 0 ? '★' : k + 1}</div>
+      <div><div class="nm"><i class="ponto" style="color:${cor(e)};background:${cor(e)}"></i>${esc(e.nome)}${e.ativa ? '' : ' <span class="selo nt">saiu</span>'}</div><div class="barra ${s.bruto <= c.A ? 'ok' : ''}"><i style="width:${s.bruto / pior * 100}%"></i></div></div>
+      <div class="vl">${diasApto(s.bruto)} d/apto<small>${plural(s.aptos, 'apto', 'aptos')}${s.halls ? ' · ' + plural(s.halls, 'hall', 'halls') : ''}</small></div></div>`; }).join('')
+    : '<p class="mudo">O ranking aparece quando a primeira unidade for concluída.</p>';
+  const fimS = R.fim, restDias = fimS ? Math.max(0, Math.ceil((prev.fimT - c.now) / 2)) : 0;
+  return `<div class="grade entra">
+  <div><div class="veredito ${v.k}"><div class="ic">${v.ic}</div><div>${v.t}</div><div class="acoes nao-imp">${R.prazo && R.feitas < R.tot ? '<button class="btn mini" data-a="ir" data-aba="simul">Simular equipes</button>' : ''}</div></div>${avisos.length ? `<div class="avisos">${avisos.join('')}</div>` : ''}</div>
+  <div class="grade topo-painel">
+    <div class="card heroi"><div id="lugar-esfera"></div><div>
+      <div class="rot">Montagem concluída</div>
+      <div class="pct"><span data-n="${R.pct}" data-dec="1">${num(R.pct, 1)}</span><small>%</small></div>
+      <dl><dt>Apartamentos</dt><dd>${R.aptosFeitos} / ${R.aptosTot}</dd><dt>Halls</dt><dd>${R.hallsFeitos} / ${R.hallsTot}</dd><dt>Faltam</dt><dd>${plural(R.tot - R.feitas, 'unidade', 'unidades')}</dd></dl>
+    </div></div>
+    <div class="kpis">
+      <div class="card kpi"><div class="rot">Previsão de término</div><div class="v">${fimS ? fData(fimS.d) : '—'}</div><div class="s">${fimS && R.feitas < R.tot ? `${TURNO[fimS.t]} · ${plural(restDias, 'dia útil', 'dias úteis')} de obra` : ''} ${seloAtraso(R.atraso)}</div></div>
+      <div class="card kpi"><div class="rot">Ritmo (aptos por semana)</div><div class="v">${R.ritmoRec != null ? `<span data-n="${R.ritmoRec}" data-dec="1">${num(R.ritmoRec, 1)}</span>` : num(R.capacidade, 1)}<small>${R.ritmoRec != null ? 'nas últimas 2 semanas' : 'capacidade das equipes'}</small></div>
+        <div class="s">${R.ritmoNec != null ? `Necessário para o prazo: <b>${isFinite(R.ritmoNec) ? num(R.ritmoNec, 1) : '∞'}</b> ${R.ritmoRec != null ? (R.ritmoRec >= R.ritmoNec ? '<span class="selo ok">acima</span>' : '<span class="selo al">abaixo</span>') : ''}` : 'Capacidade atual: ' + num(R.capacidade, 1) + ' por semana'}</div></div>
+      <div class="card kpi"><div class="rot">Equipes</div><div class="v"><span data-n="${n}">${n}</span><small>${n === 1 ? 'ativa' : 'ativas'}</small></div>
+        <div class="s">${R.precisa ? `Para o prazo: <b>${R.precisa}</b> ${R.precisa > n ? `<span class="selo al">faltam ${R.precisa - n}</span>` : R.precisa < n ? `<span class="selo ok">sobram ${n - R.precisa}</span>` : '<span class="selo ok">na medida</span>'}` : `Média real: ${c.brutoGeral ? diasApto(c.brutoGeral) + ' dias por apto' : 'ainda sem dados'}`}</div></div>
+      <div class="card kpi"><div class="rot">Pavimentos liberados</div><div class="v"><span data-n="${R.liberados}">${R.liberados}</span><small>de ${S.pavs.length}</small></div>
+        <div class="s">${R.proximo ? `Próximo: <b>${R.proximo.n}º</b> em ${fSem(c.cal.em(R.proximo.fimT).d)}` : ''}</div></div>
+    </div>
+  </div>
+  <div class="card"><div class="rot"><span>Edifício · clique na unidade para marcar</span><span class="legenda"><span><i></i>a fazer</span><span><i style="background:#1b2a46;border-color:var(--marca-txt)"></i>em montagem</span><span><i style="background:#1f7044;border-color:#3bb873"></i>concluído (traço = manhã ou tarde)</span></span></div><div class="predio">${linhas}</div></div>
+  <div class="grade baixo-painel">
+    <div class="card graf"><div class="rot"><span>Avanço: realizado, previsão e prazo</span><span class="legenda"><span><i style="background:var(--ok);border:0;height:3px"></i>realizado</span><span><i style="background:var(--marca-txt);border:0;height:3px"></i>previsão</span><span><i style="background:var(--aviso);border:0;height:3px"></i>ritmo para o prazo</span></span></div><div id="grafico"></div></div>
+    <div class="card"><div class="rot"><span>Velocidade das equipes</span><span class="mudo" style="letter-spacing:0;text-transform:none;font-weight:500">planejado: ${num(S.cfg.aptoDias, 1)} d/apto</span></div><div class="rank">${rank}</div></div>
+  </div></div>`;
+};
+function depoisAcomp() {
+  const l = $('#lugar-esfera'); if (l) { l.appendChild(Esfera.cv); const ord = [...R.c.unidades].sort((a, b) => a.pav - b.pav || 0); Esfera.definir(ord.map(u => R.c.feito.has(u.id) ? 2 : R.emAnd.has(u.id) ? 1 : 0)); }
+  const g = $('#grafico'); if (g) g.innerHTML = grafico(g.clientWidth || 800, 280);
+}
+/** Gráfico de avanço (SVG): unidades concluídas por data, a previsão e a linha do prazo. */
+function grafico(W, H) {
+  const { c, prev } = R, hoje = dn(c.ag.d), x0 = Math.min(dn(S.cfg.inicio), hoje);
+  const fimD = R.fim ? dn(R.fim.d) : hoje, x1 = Math.max(fimD, R.prazo ? dn(R.prazo) : 0, hoje + 7) + 4;
+  const L = 40, Rm = 16, T = 12, B = 26, px = d => L + (d - x0) / (x1 - x0) * (W - L - Rm), py = v => T + (1 - v / R.tot) * (H - T - B);
+  const porDia = {}; c.feito.forEach(f => porDia[dn(f.d)] = (porDia[dn(f.d)] || 0) + 1);
+  let ac = 0, real = `M${px(x0)},${py(0)}`;
+  for (let d = x0; d <= hoje; d++) { if (porDia[d]) { ac += porDia[d]; } real += `L${px(d)},${py(ac)}`; }
+  const fut = {}; if (prev) prev.plano.forEach(p => { const d = Math.max(hoje, dn(c.cal.em(p.fim).d)); fut[d] = (fut[d] || 0) + 1; });
+  let ap = ac, prevL = `M${px(hoje)},${py(ac)}`;
+  for (let d = hoje + 1; d <= fimD; d++) { if (fut[d]) ap += fut[d]; prevL += `L${px(d)},${py(ap)}`; }
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const v = R.tot * k / 4; g += `<line x1="${L}" x2="${W - Rm}" y1="${py(v)}" y2="${py(v)}" stroke="#263444" stroke-dasharray="${k ? '2 5' : ''}"/><text x="${L - 8}" y="${py(v) + 4}" text-anchor="end" fill="#8f99a5" font-size="11">${k * 25}%</text>`; }
+  for (let d = x0; d <= x1; d++) { const s = dnIso(d); if (s.slice(8) === '01') g += `<line x1="${px(d)}" x2="${px(d)}" y1="${T}" y2="${H - B}" stroke="#1d2835"/><text x="${px(d) + 5}" y="${H - 8}" fill="#8f99a5" font-size="11" font-weight="600">${MES[+s.slice(5, 7) - 1]}/${s.slice(2, 4)}</text>`; }
+  const marca = (d, corL, txt, y) => `<line x1="${px(d)}" x2="${px(d)}" y1="${T}" y2="${H - B}" stroke="${corL}" stroke-width="1.5" stroke-dasharray="4 4"/><text x="${px(d)}" y="${y}" text-anchor="${px(d) > W - 90 ? 'end' : 'middle'}" fill="${corL}" font-size="11" font-weight="700">${txt}</text>`;
+  return `<svg height="${H}" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fd184" stop-opacity=".35"/><stop offset="1" stop-color="#4fd184" stop-opacity="0"/></linearGradient></defs>${g}
+    ${R.prazo ? `<line x1="${px(dn(S.cfg.inicio))}" y1="${py(0)}" x2="${px(dn(R.prazo))}" y2="${py(R.tot)}" stroke="#f0b04a" stroke-width="1.5" stroke-dasharray="6 5" opacity=".8"/>` + marca(dn(R.prazo), '#f0b04a', 'prazo ' + fCurta(R.prazo), T + 10) : ''}
+    ${marca(hoje, '#8f99a5', 'hoje', H - B - 6)}
+    <path d="${real}L${px(hoje)},${py(0)}Z" fill="url(#gr)"/>
+    <path class="tr" pathLength="1" d="${real}" fill="none" stroke="#4fd184" stroke-width="2.5" stroke-linejoin="round"/>
+    <path class="tr" pathLength="1" d="${prevL}" fill="none" stroke="#8aaaf0" stroke-width="2" stroke-dasharray=".008 .008" stroke-linejoin="round"/>
+    ${R.fim && R.feitas < R.tot ? `<circle cx="${px(fimD)}" cy="${py(R.tot)}" r="5" fill="#8aaaf0"/><circle cx="${px(fimD)}" cy="${py(R.tot)}" r="10" fill="#8aaaf0" opacity=".25"/><text x="${px(fimD) - 12}" y="${py(R.tot) + 16}" text-anchor="end" fill="#8aaaf0" font-size="11" font-weight="700">término ${fCurta(R.fim.d)}</text>` : ''}
+    <circle cx="${px(hoje)}" cy="${py(ac)}" r="4.5" fill="#4fd184"/></svg>`;
+}
+
+/* ---------- G2. Cronograma por equipe ---------- */
+telas.crono = () => {
+  const { c, prev } = R, W = 15, NOME = 150;
+  if (!R.c.unidades.length) return '';
+  const a = c.T0, b = Math.ceil(Math.max(prev ? prev.fimT : 0, c.now, ...[...c.feito.values()].map(f => f.T))) + 8, n = b - a;
+  const X = T => NOME + (T - a) * W;
+  let cab = '', grade = '', mesAnt = '';
+  for (let i = a; i < b; i++) {
+    const s = c.cal.slots[i]; if (!s) break; if (i > a && c.cal.slots[i - 1].d === s.d) continue;
+    const larg = (c.cal.slots[i + 1] && c.cal.slots[i + 1].d === s.d ? 2 : 1) * W, seg = i === a || dn(s.d) - dn(c.cal.slots[i - 1].d) > 1;
+    if (s.d.slice(0, 7) !== mesAnt) { mesAnt = s.d.slice(0, 7); cab += `<div class="m" style="left:${X(i)}px">${MES[+s.d.slice(5, 7) - 1]} ${s.d.slice(0, 4)}</div>`; }
+    cab += `<div class="d ${seg ? 'sg' : ''} ${s.d === c.ag.d ? 'hoje' : ''}" style="left:${X(i)}px;width:${larg}px">${DS[dsem(s.d)][0].toUpperCase()}<br>${s.d.slice(8)}</div>`;
+    if (seg) grade += `<div class="g-sem" style="left:${X(i)}px"></div>`;
+  }
+  const eqs = [...S.equipes.filter(e => e.ativa), ...S.equipes.filter(e => !e.ativa && c.st[e.id].peso)];
+  const linhas = eqs.map(e => {
+    const s = c.st[e.id]; let ant = s.ini0, h = '';
+    for (const x of s.lista) { const ini = Math.min(ant, x.T - 1), f = c.feito.get(x.u.id); h += blk('ok', ini, x.T, x.u, `${x.u.nome}\nConcluído ${fSem(f.d)} · ${TURNO[f.t]}`); ant = x.T; }
+    if (prev && e.ativa) [...prev.plano.values()].filter(p => p.eq === e.id).forEach((p, k) => { const sl = c.cal.em(p.fim); h += blk(k === 0 && c.iniciou ? 'and' : p.u.pav % 2 ? '' : 'alt', Math.max(p.ini, k === 0 ? Math.min(p.ini, p.fim - 1) : p.ini), p.fim, p.u, `${p.u.nome}\nPrevisão: ${fSem(sl.d)} · ${TURNO[sl.t]}`); });
+    return `<div class="g-row ${e.ativa ? '' : 'fora'}"><div class="g-nome"><i class="ponto" style="color:${cor(e)};background:${cor(e)}"></i>${esc(e.nome)}</div>${h}</div>`;
+  }).join('');
+  function blk(cls, ini, fim, u, dica) { const l = X(Math.max(ini, a)), w = Math.max(W - 2, X(fim) - l - 2); return `<button class="blk ${cls}" style="left:${l}px;width:${w}px" data-a="unidade" data-u="${u.id}" data-dica="${esc(dica)}">${w >= 26 ? (u.tipo === 'hall' ? 'H' + u.pav : u.nome) : ''}</button>`; }
+  return `<div class="grade entra"><div class="card"><div class="rot"><span>Cronograma por equipe · cada dia dividido em manhã e tarde</span><span class="legenda"><span><i style="background:#1f7044;border-color:#3bb873"></i>concluído</span><span><i style="background:#1b2a46;border-color:var(--marca-txt)"></i>em montagem</span><span><i style="background:var(--sup)"></i>previsto</span><button class="btn mini" data-a="gantt-hoje">Ir para hoje</button></span></div>
+    <div class="gantt" id="gantt"><div class="g-in" style="width:${NOME + n * W}px"><div class="g-head"><div class="g-nome rot">Equipe</div>${cab}</div>${grade}<div class="g-hoje" style="left:${X(c.now)}px" id="g-hoje"></div>${linhas || '<p class="mudo" style="padding:20px 170px">Nenhuma equipe ativa.</p>'}</div></div>
+    <p class="mudo" style="margin-top:12px">A distribuição é automática: a equipe que fica livre pega a próxima unidade, seguindo a ordem dos pavimentos. Ela se refaz sozinha a cada conclusão marcada e a cada equipe que entra ou sai.</p></div></div>`;
+};
+
+/* ---------- G3. Equipes ---------- */
+telas.equipes = () => {
+  const { c } = R, melhor = S.equipes.filter(e => c.st[e.id].peso > 0).sort((a, b) => c.st[a.id].bruto - c.st[b.id].bruto)[0];
+  const cartao = e => {
+    const s = c.st[e.id], at = e.ativa && R.atual[e.id], sl = at && c.cal.em(at.fim), ult = s.lista[s.lista.length - 1];
+    return `<div class="card eq ${e.ativa ? '' : 'fora'}"><div class="cab"><i class="ponto" style="color:${cor(e)};background:${cor(e)};width:12px;height:12px"></i><b>${esc(e.nome)}</b>
+      ${melhor === e ? '<span class="selo av">★ mais rápida</span>' : ''}<span class="selo ${e.tipo === 'fixa' ? 'mc' : 'nt'}">${e.tipo === 'fixa' ? 'fixa' : 'terceirizada'}</span></div>
+      <div class="nums"><div><b>${s.aptos + s.halls}</b><span>${s.halls ? s.aptos + ' aptos · ' + s.halls + ' halls' : 'concluídas'}</span></div>
+        <div><b>${s.bruto ? diasApto(s.bruto) : '—'}</b><span>dias/apto real</span></div>
+        <div><b>${diasApto(S.cfg.base === 'plano' ? c.A : s.ritmo)}</b><span>dias/apto previsão</span></div></div>
+      <div class="agora">${!e.ativa ? '<span class="mudo">Fora da obra. O histórico continua valendo nas médias.</span>' : at ? `<div><span class="mudo">${c.iniciou ? 'Agora em' : 'Começa por'}</span> <b>${esc(at.u.nome)}</b><br><span class="mudo">previsão ${fSem(sl.d)} · ${TURNO[sl.t]}</span></div><button class="btn pri mini" data-a="unidade" data-u="${at.u.id}" data-e="${e.id}">Concluir</button>` : '<span class="mudo">Sem unidade na fila.</span>'}</div>
+      <div class="linha" style="justify-content:space-between"><span class="mudo" style="font-size:12px">${ult ? 'Última: ' + esc(ult.u.nome) + ' em ' + fCurta(c.feito.get(ult.u.id).d) : e.entrada ? 'Entra em ' + fData(e.entrada) : 'Desde o início da obra'}</span>
+        <div class="rod"><button class="btn mini" data-a="editar-equipe" data-e="${e.id}">Editar</button>${e.ativa ? `<button class="btn mini perigo" data-a="retirar" data-e="${e.id}">Retirar</button>` : `<button class="btn mini" data-a="reativar" data-e="${e.id}">Reativar</button>`}</div></div></div>`;
+  };
+  return `<div class="grade entra">
+    <div class="card"><div class="rot">Nova equipe</div><div class="nova"><label class="campo">Nome<input id="ne-nome" placeholder="Ex.: Terceirizada João" maxlength="40"></label>
+      <label class="campo">Tipo<select id="ne-tipo"><option value="terceirizada">Terceirizada</option><option value="fixa">Fixa da loja</option></select></label>
+      <label class="campo">Começa em<input type="date" id="ne-entrada" value="${R.prox}"></label><button class="btn pri" data-a="nova-equipe">Adicionar equipe</button></div>
+      <p class="mudo" style="margin-top:12px">Ao adicionar ou retirar uma equipe o cronograma inteiro é refeito na hora. Equipe nova entra na previsão com o ritmo médio real da obra (${diasApto(c.ritmoGeral)} dias por apto) até ter as próprias conclusões.</p></div>
+    <div class="grade eqs">${S.equipes.filter(e => e.ativa).map(cartao).join('')}${S.equipes.filter(e => !e.ativa).map(cartao).join('')}</div></div>`;
+};
+
+/* ---------- G4. Simulador ---------- */
+telas.simul = () => {
+  const { c } = R, n = c.ativos.length, base = S.cfg.base;
+  if (!sim.alvo) sim.alvo = R.prazo || (R.fim ? R.fim.d : c.ag.d);
+  if (!sim.entrada || sim.entrada < R.prox) sim.entrada = R.prox;
+  if (R.feitas === R.tot) return `<div class="card entra"><p>Montagem concluída. Nada a simular.</p></div>`;
+  const precisa = equipesPara(c, S, sim.alvo, sim.entrada, base), max = Math.min(60, Math.max(12, (precisa || 0) + 2, n + 2));
+  const linhas = []; let pior = 1;
+  for (let N = 1; N <= max; N++) { const p = preverComN(c, S, N, sim.entrada, base), s = c.cal.em(p.fimT); linhas.push({ N, s, dias: dn(s.d) - dn(c.ag.d) }); }
+  pior = Math.max(...linhas.map(l => l.dias), 1);
+  const dif = precisa == null ? null : precisa - n;
+  return `<div class="grade sim entra">
+    <div class="card"><div class="rot">Quantas equipes para terminar em…</div>
+      <div class="form"><label class="campo">Data em que quero terminar<input type="date" data-sim="alvo" value="${sim.alvo}"></label>
+        <label class="campo">Equipes novas começam em<input type="date" data-sim="entrada" value="${sim.entrada}" min="${R.prox}"></label>
+        <div class="campo tudo">Base do cálculo<div class="seg"><button class="${base === 'real' ? 'on' : ''}" data-a="base" data-v="real">Ritmo real da obra</button><button class="${base === 'plano' ? 'on' : ''}" data-a="base" data-v="plano">Planejado (${num(S.cfg.aptoDias, 1)} dias/apto)</button></div></div></div>
+      <div class="res">${precisa ? `<div class="g" data-n="${precisa}">${precisa}</div><p><b>${plural(precisa, 'equipe', 'equipes')}</b> para terminar até ${fData(sim.alvo)}</p>
+        <p>${dif > 0 ? `<span class="selo al">contratar +${dif}</span> hoje são ${n}` : dif < 0 ? `<span class="selo ok">sobram ${-dif}</span> hoje são ${n}` : `<span class="selo ok">exatamente as ${n} de hoje</span>`}</p>`
+        : `<div class="g">—</div><p>Não dá para terminar até ${fData(sim.alvo)}, nem com 60 equipes começando em ${fCurta(sim.entrada)}.</p>`}</div>
+      <p class="mudo" style="margin-top:14px;font-size:12px">Como eu calculo: faltam ${plural(R.tot - R.feitas, 'unidade', 'unidades')}. As equipes de hoje seguem cada uma no seu ritmo; as equipes a mais entram no ritmo médio real da obra (${diasApto(base === 'plano' ? c.A : c.ritmoGeral)} dias por apto). Com menos equipes do que hoje, saem primeiro as mais lentas.</p></div>
+    <div class="card"><div class="rot"><span>Término conforme a quantidade de equipes</span><span class="mudo" style="letter-spacing:0;text-transform:none;font-weight:500">barra = tempo que falta</span></div>
+      <div class="grade" style="gap:4px">${linhas.map(l => { const ok = dn(l.s.d) <= dn(sim.alvo), d = dn(l.s.d) - dn(sim.alvo);
+        return `<div class="sl ${l.N === precisa ? 'meta' : l.N === n ? 'atual' : ''}"><span>${plural(l.N, 'equipe', 'equipes')}</span><div class="barra ${ok ? 'ok' : 'al'}"><i style="width:${l.dias / pior * 100}%"></i></div><span class="dir">${fData(l.s.d)}</span>
+          <span class="dir">${l.N === precisa ? '<span class="selo ok">mínimo p/ a data</span>' : l.N === n ? '<span class="selo mc">hoje</span>' : `<span class="mudo">${d > 0 ? '+' : ''}${plural(d, 'dia', 'dias')}</span>`}</span></div>`; }).join('')}</div></div></div>`;
+};
+
+/* ---------- G5. Cliente (previsão de liberação dos pavimentos) ---------- */
+function linhasCliente() {
+  const { c } = R, mg = (S.cfg.margemCliente || 0) * 2;
+  return [...S.pavs].sort((a, b) => a.n - b.n).map(p => { const i = R.pav[p.n], pronto = i.feitos === i.tot;
+    const s = i.fimT && !i.incerto ? c.cal.em(i.fimT + (pronto ? 0 : mg)) : null;
+    return { n: p.n, q: p.q, pc: i.tot ? i.feitos / i.tot * 100 : 0, pronto, s, est: pronto ? 'Liberado' : i.feitos || i.and ? 'Em montagem' : 'Aguardando' }; });
+}
+telas.cliente = () => {
+  const { c } = R, ls = linhasCliente(), mg = S.cfg.margemCliente || 0;
+  const fimC = R.fim ? (R.feitas === R.tot ? R.fim : c.cal.em(R.prev.fimT + mg * 2)) : null;
+  return `<div class="grade entra"><div class="card">
+    <div class="cli-cab"><div><div class="rot">Previsão de liberação dos pavimentos</div><h2>${esc(S.cfg.nome)}</h2><p class="mudo">Atualizado em ${fData(c.ag.d)} · ${R.liberados} de ${S.pavs.length} pavimentos liberados · conclusão total prevista para <b style="color:inherit">${fimC ? fData(fimC.d) : '—'}</b></p></div>
+      <div class="linha nao-imp"><label class="campo" style="width:190px">Margem de segurança (dias úteis)<input type="number" min="0" max="30" data-cfg="margemCliente" value="${mg}"></label>
+        <button class="btn" data-a="copiar-cliente">Copiar texto p/ WhatsApp</button><button class="btn pri" data-a="imprimir">Imprimir / PDF</button></div></div>
+    <table class="tab"><thead><tr><th>Pavimento</th><th>Unidades</th><th style="width:30%">Avanço</th><th>Situação</th><th>Liberação</th></tr></thead><tbody>
+      ${ls.map(l => `<tr><td><b>${l.n}º pavimento</b></td><td>${plural(l.q, 'apto', 'aptos')} + hall</td>
+        <td><div class="pg" style="display:grid;grid-template-columns:1fr 44px;gap:12px;align-items:center"><div class="barra ${l.pronto ? 'ok' : ''}"><i style="width:${l.pc}%"></i></div><b class="dir">${num(l.pc)}%</b></div></td>
+        <td><span class="selo ${l.pronto ? 'ok' : l.est === 'Em montagem' ? 'mc' : 'nt'}">${l.est}</span></td>
+        <td>${l.s ? `<b>${fData(l.s.d)}</b> <span class="mudo">${DS[dsem(l.s.d)]} · ${l.pronto ? 'entregue' : 'fim da ' + TURNO[l.s.t]}</span>` : '<span class="mudo">sem previsão</span>'}</td></tr>`).join('')}
+    </tbody></table>
+    <p class="mudo" style="margin-top:14px;font-size:12px">Datas previstas com base no andamento real da montagem; podem ser ajustadas conforme a obra avança.${mg ? ` <span class="nao-imp">(Inclui ${plural(mg, 'dia útil', 'dias úteis')} de margem sobre a previsão interna.)</span>` : ' <span class="nao-imp">(Sem margem: são as mesmas datas da previsão interna. Recomendo passar ao cliente com alguns dias de folga.)</span>'}</p></div></div>`;
+};
+function textoCliente() {
+  const ls = linhasCliente(), mg = (S.cfg.margemCliente || 0) * 2, fimC = R.fim ? (R.feitas === R.tot ? R.fim : R.c.cal.em(R.prev.fimT + mg)) : null;
+  return `*${S.cfg.nome} · previsão de liberação dos pavimentos*\nAtualizado em ${fData(R.c.ag.d)}\n\n` + ls.map(l => l.pronto ? `✅ ${l.n}º pavimento: liberado em ${fCurta(l.s.d)}` : `${l.n}º pavimento: ${l.s ? fData(l.s.d) + ' (' + TURNO[l.s.t] + ')' : 'a definir'}`).join('\n')
+    + `\n\nConclusão total prevista: ${fimC ? fData(fimC.d) : 'a definir'}\nDatas previstas com base no andamento da montagem; podem ser ajustadas.`;
+}
+
+/* ---------- G6. Configurações ---------- */
+telas.config = () => {
+  const c = S.cfg, totA = S.pavs.reduce((s, p) => s + p.q, 0), ROT = ['não trabalha', 'só manhã', 'dia inteiro'];
+  return `<div class="grade cfg entra">
+    <div class="grade">
+      <div class="card"><div class="rot"><span>Obra</span>${S.conferido ? '' : '<button class="btn mini pri" data-a="conferido">Já conferi os dados</button>'}</div><div class="form">
+        <label class="campo tudo">Nome da obra<input data-cfg="nome" value="${esc(c.nome)}" maxlength="40"></label>
+        <label class="campo">Início da montagem<input type="date" data-cfg="inicio" value="${c.inicio}"></label>
+        <label class="campo">Prazo combinado com o cliente<input type="date" data-cfg="prazo" value="${c.prazo}"></label>
+        <label class="campo">Dias por apartamento (1 equipe)<input type="number" step="0.5" min="0.5" max="30" data-cfg="aptoDias" value="${c.aptoDias}"></label>
+        <label class="campo">Dias por hall (provisório)<input type="number" step="0.5" min="0.5" max="30" data-cfg="hallDias" value="${c.hallDias}"></label>
+        <div class="campo tudo">Ordem de montagem<div class="seg"><button class="${c.ordem === 'asc' ? 'on' : ''}" data-a="ordem" data-v="asc">De baixo para cima</button><button class="${c.ordem === 'desc' ? 'on' : ''}" data-a="ordem" data-v="desc">De cima para baixo</button></div></div>
+        <div class="campo tudo">Base da previsão<div class="seg"><button class="${c.base === 'real' ? 'on' : ''}" data-a="base" data-v="real">Ritmo real das equipes</button><button class="${c.base === 'plano' ? 'on' : ''}" data-a="base" data-v="plano">Sempre o planejado</button></div></div></div></div>
+      <div class="card"><div class="rot">Dias de trabalho · clique para alternar</div>
+        <div class="dias">${c.semana.map((m, i) => `<button class="m${m}" data-a="dia" data-i="${i}">${DS[i].toUpperCase()}<small>${ROT[m]}</small></button>`).join('')}</div>
+        <div class="rot" style="margin:18px 0 10px">Feriados e dias parados</div>
+        <div class="linha"><label class="campo" style="width:180px"><input type="date" id="fer-data"></label><button class="btn" data-a="fer-add">Adicionar</button><button class="btn" data-a="fer-nac">+ Feriados nacionais 2026/2027</button></div>
+        <div class="fer">${[...c.feriados].sort().map(f => `<span class="selo nt">${fSem(f)}/${f.slice(2, 4)}<button data-a="fer-del" data-d="${f}" aria-label="Remover">×</button></span>`).join('') || '<span class="mudo">Nenhum cadastrado.</span>'}</div></div>
+    </div>
+    <div class="grade">
+      <div class="card"><div class="rot"><span>Apartamentos por pavimento</span><span class="selo ${totA === 232 ? 'ok' : 'av'}">${totA} aptos + ${S.pavs.length} halls${totA === 232 ? '' : ' · contrato: 232'}</span></div>
+        <div class="pavs-cfg">${S.pavs.map((p, i) => `<label>${p.n}º pavimento<input type="number" min="0" max="40" data-pav="${i}" value="${p.q}"></label>`).join('')}</div>
+        <div class="linha" style="margin-top:14px"><button class="btn mini" data-a="pav-add">+ Pavimento</button><button class="btn mini" data-a="pav-del" ${S.pavs.length > 1 ? '' : 'disabled'}>Remover o último</button><span class="mudo" style="font-size:12px">Numeração: 3º pavimento = 301, 302… Cada pavimento tem 1 hall.</span></div></div>
+      <div class="card"><div class="rot">Backup · os dados ficam só neste navegador</div>
+        <p class="mudo" style="margin-bottom:14px">Se o navegador for limpo ou você trocar de computador, os dados somem. Baixe o backup toda semana e guarde o arquivo. ${S.backupEm ? 'Último backup: ' + fData(S.backupEm) + '.' : ''}</p>
+        <div class="linha"><button class="btn pri" data-a="backup">Baixar backup</button><button class="btn" data-a="restaurar">Restaurar backup</button><input type="file" id="arq" accept=".json" hidden>
+          <button class="btn" data-a="demo">${DEMO ? 'Sair do exemplo' : 'Ver com dados de exemplo'}</button><button class="btn perigo" data-a="zerar">Zerar tudo</button></div></div>
+    </div></div>`;
+};
+
+/* =====================================================================
+   H. DESENHO, JANELAS E EVENTOS
+   ===================================================================== */
+function desenhar(animar) {
+  calcular();
+  const tela = $('#tela'), rolagem = scrollY, gs = $('#gantt') ? $('#gantt').scrollLeft : null;
+  tela.innerHTML = telas[aba]();
+  if (!animar) $$('.entra', tela).forEach(e => e.classList.remove('entra'));
+  if (aba === 'acomp') depoisAcomp();
+  if (aba === 'crono') { const g = $('#gantt'); if (g) g.scrollLeft = gs != null && !animar ? gs : Math.max(0, $('#g-hoje').offsetLeft - 420); }
+  if (animar) $$('[data-n]', tela).forEach(contar); else scrollTo(0, rolagem);
+  $('#nome-obra').textContent = S.cfg.nome.toUpperCase(); document.title = S.cfg.nome + ' · Cronograma de montagem';
+  $('#hoje-txt').textContent = fSem(R.c.ag.d) + '/' + R.c.ag.d.slice(0, 4);
+  $('#salvo').textContent = DEMO ? 'Modo exemplo (não grava)' : 'Salvo neste navegador';
+  $('#demo-faixa').innerHTML = DEMO ? '<div class="demo-faixa">MODO EXEMPLO · dados fictícios para você ver como fica. Nada aqui é gravado.<button data-a="demo">Sair do exemplo</button></div>' : '';
+  $$('#abas button').forEach(b => b.classList.toggle('on', b.dataset.aba === aba));
+  const on = $('#abas button.on'), ind = $('#abas i'); ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
+}
+function contar(el) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const fim = +el.dataset.n, dec = +(el.dataset.dec || 0), t0 = performance.now();
+  const passo = t => { const k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 4); el.textContent = num(fim * e, dec); if (k < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+}
+function toast(html, erro) {
+  const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = html; if (erro) t.style.borderLeftColor = 'var(--alerta)';
+  $('#toasts').appendChild(t); setTimeout(() => { t.classList.add('sai'); setTimeout(() => t.remove(), 300); }, 4200);
+}
+function abrirJanela(html) { $('#flut').innerHTML = `<div class="veu" data-a="fechar-veu"><div class="janela" role="dialog" aria-modal="true">${html}</div></div>`; const f = $('#flut input, #flut button.pri'); if (f) f.focus(); }
+function fecharJanela() { $('#flut').innerHTML = ''; }
+function confirmar(titulo, texto, rotulo, fn, perigo) {
+  abrirJanela(`<h3>${titulo}</h3><p class="mudo">${texto}</p><div class="rod"><button class="btn" data-a="fechar">Cancelar</button><button class="btn ${perigo ? 'perigo' : 'pri'}" id="conf-ok">${rotulo}</button></div>`);
+  $('#conf-ok').onclick = fn;
+}
+/** Janela da unidade: concluir (equipe, data, manhã ou tarde), reservar para uma equipe ou desfazer. */
+function janelaUnidade(id, eqSug) {
+  const { c, prev } = R, u = c.porId.get(id), f = c.feito.get(id), pl = prev && prev.plano.get(id), ag = c.ag;
+  const sel = f ? f.e : eqSug || S.fixos[id] || (pl && eq(pl.eq) ? pl.eq : (c.ativos[0] || {}).id);
+  const lista = S.equipes.filter(e => e.ativa || e.id === sel || c.st[e.id].peso);
+  const sl = pl && c.cal.em(pl.fim);
+  abrirJanela(`<h3>${u.tipo === 'hall' ? esc(u.nome) : 'Apto ' + esc(u.nome)} <small>${u.pav}º pavimento</small></h3>
+    <div>${f ? `<span class="selo ok">✓ Concluído ${fSem(f.d)} · ${TURNO[f.t]}</span>` : R.emAnd.has(id) ? `<span class="selo mc">Em montagem · previsão ${fSem(sl.d)} ${TURNO[sl.t]}</span>` : sl ? `<span class="selo nt">Previsão ${fSem(sl.d)} · ${TURNO[sl.t]}</span>` : '<span class="selo nt">Sem previsão</span>'}</div>
+    <div class="campo">Equipe que montou<div class="chips" id="ju-eq">${lista.map(e => `<button type="button" class="${e.id === sel ? 'on' : ''}" style="--c:${cor(e)}" data-e="${e.id}"><i class="ponto" style="color:${cor(e)};background:${cor(e)}"></i>${esc(e.nome)}${e.ativa ? '' : ' (saiu)'}</button>`).join('') || '<span class="mudo">Cadastre uma equipe primeiro.</span>'}</div></div>
+    <div class="form"><label class="campo">Concluído em<input type="date" id="ju-data" value="${f ? f.d : ag.d}" max="${ag.d}"></label>
+      <div class="campo">Turno<div class="seg" id="ju-turno"><button type="button" class="${(f ? f.t : ag.t) === 0 ? 'on' : ''}" data-t="0">Manhã</button><button type="button" class="${(f ? f.t : ag.t) === 1 ? 'on' : ''}" data-t="1">Tarde</button></div></div></div>
+    <div class="rod">${f ? `<button class="btn perigo" id="ju-desf">Desfazer conclusão</button>` : `<button class="btn" id="ju-res">${S.fixos[id] ? 'Tirar reserva' : 'Só reservar para a equipe'}</button>`}<button class="btn" data-a="fechar">Cancelar</button><button class="btn pri" id="ju-ok" ${lista.length ? '' : 'disabled'}>${f ? 'Salvar' : 'Concluir'}</button></div>`);
+  const troca = (box, attr) => $(box).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(box + ' button').forEach(x => x.classList.toggle('on', x === b)); });
+  troca('#ju-eq'); troca('#ju-turno');
+  const esc2 = () => ($('#ju-eq .on') || {}).dataset?.e;
+  $('#ju-ok').onclick = () => { const d = $('#ju-data').value; if (!d || d > ag.d) return toast('Escolha uma data até hoje.', true); acoes.concluir(id, d, +$('#ju-turno .on').dataset.t, esc2()); };
+  if (f) $('#ju-desf').onclick = () => acoes.desfazer(id); else $('#ju-res').onclick = () => acoes.reservar(id, S.fixos[id] ? null : esc2());
+}
+function janelaEquipe(id) {
+  const e = eq(id);
+  abrirJanela(`<h3>Editar equipe</h3><label class="campo">Nome<input id="ee-nome" value="${esc(e.nome)}" maxlength="40"></label>
+    <div class="form"><label class="campo">Tipo<select id="ee-tipo"><option value="fixa" ${e.tipo === 'fixa' ? 'selected' : ''}>Fixa da loja</option><option value="terceirizada" ${e.tipo !== 'fixa' ? 'selected' : ''}>Terceirizada</option></select></label>
+    <label class="campo">Começou em (vazio = início da obra)<input type="date" id="ee-entrada" value="${e.entrada || ''}"></label></div>
+    <div class="rod"><button class="btn" data-a="fechar">Cancelar</button><button class="btn pri" id="ee-ok">Salvar</button></div>`);
+  $('#ee-ok').onclick = () => acoes.editarEquipe(id, $('#ee-nome').value.trim(), $('#ee-tipo').value, $('#ee-entrada').value);
+}
+
+document.addEventListener('click', ev => {
+  const ab = ev.target.closest('[data-aba]'); if (ab) { aba = ab.dataset.aba; scrollTo(0, 0); desenhar(true); return; }
+  const b = ev.target.closest('[data-a]'); if (!b) return; const d = b.dataset;
+  switch (d.a) {
+    case 'fechar-veu': if (ev.target === b) fecharJanela(); break;
+    case 'fechar': fecharJanela(); break;
+    case 'unidade': janelaUnidade(d.u, d.e); break;
+    case 'ir': aba = d.aba; desenhar(true); break;
+    case 'gantt-hoje': $('#gantt').scrollTo({ left: Math.max(0, $('#g-hoje').offsetLeft - 420), behavior: 'smooth' }); break;
+    case 'nova-equipe': { const n = $('#ne-nome').value.trim(); if (!n) { toast('Dê um nome para a equipe.', true); $('#ne-nome').focus(); break; } acoes.novaEquipe(n, $('#ne-tipo').value, $('#ne-entrada').value); break; }
+    case 'editar-equipe': janelaEquipe(d.e); break;
+    case 'retirar': { const e = eq(d.e); confirmar('Retirar ' + esc(e.nome) + '?', 'O cronograma é refeito com as equipes que ficam. O que ela já concluiu continua registrado e ela pode ser reativada depois.', 'Retirar da obra', () => acoes.retirar(d.e), true); break; }
+    case 'reativar': acoes.reativar(d.e); break;
+    case 'base': S.cfg.base = d.v; aplicar(); break;
+    case 'ordem': S.cfg.ordem = d.v; aplicar(); break;
+    case 'dia': S.cfg.semana[+d.i] = (S.cfg.semana[+d.i] + 1) % 3; aplicar(); break;
+    case 'conferido': S.conferido = true; aplicar(() => 'Dados da obra conferidos.'); break;
+    case 'fer-add': { const v = $('#fer-data').value; if (v && !S.cfg.feriados.includes(v)) { S.cfg.feriados.push(v); aplicar(); } break; }
+    case 'fer-del': S.cfg.feriados = S.cfg.feriados.filter(x => x !== d.d); aplicar(); break;
+    case 'fer-nac': { for (const f of ['2026-11-20', '2026-12-25', '2027-01-01', '2027-03-26', '2027-04-21', '2027-05-01', '2027-09-07', '2027-10-12', '2027-11-02', '2027-11-15', '2027-11-20', '2027-12-25']) if (!S.cfg.feriados.includes(f)) S.cfg.feriados.push(f); aplicar(() => 'Feriados nacionais adicionados. Carnaval, Corpus Christi e feriados locais você adiciona à mão.'); break; }
+    case 'pav-add': S.pavs.push({ n: Math.max(0, ...S.pavs.map(p => p.n)) + 1, q: S.pavs[S.pavs.length - 1]?.q || 14 }); aplicar(); break;
+    case 'pav-del': { const p = S.pavs[S.pavs.length - 1]; if (Object.keys(S.feitos).some(k => k.startsWith(p.n + '-'))) { toast('Esse pavimento já tem unidade concluída. Desfaça as conclusões antes.', true); break; } S.pavs.pop(); aplicar(); break; }
+    case 'backup': { S.backupEm = agora().d; salvar(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' })); a.download = `backup-golden-flats-${agora().d}.json`; a.click(); desenhar(false); toast('Backup baixado. Guarde o arquivo em lugar seguro.'); break; }
+    case 'restaurar': $('#arq').click(); break;
+    case 'zerar': confirmar('Zerar tudo?', 'Apaga todas as conclusões, equipes e configurações deste navegador. Não tem volta. Baixe um backup antes.', 'Apagar tudo', () => { S = estadoPadrao(); fecharJanela(); aplicar(() => 'Tudo zerado.'); }, true); break;
+    case 'demo': DEMO = !DEMO; S = DEMO ? estadoExemplo() : carregar(); sim.alvo = sim.entrada = ''; aba = DEMO ? 'acomp' : aba; desenhar(true); break;
+    case 'imprimir': print(); break;
+    case 'copiar-cliente': navigator.clipboard.writeText(textoCliente()).then(() => toast('Texto copiado. Confira antes de enviar ao cliente.'), () => toast('Não consegui copiar neste navegador.', true)); break;
+  }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.dataset.cfg) {
+    const k = t.dataset.cfg; let v = t.value;
+    if (t.type === 'number') { v = Math.max(+t.min || 0, Math.min(+t.max || 99, +v || 0)); }
+    if (k === 'inicio' && !v) return desenhar(false);
+    if (k === 'nome' && !v.trim()) v = 'Golden Flats';
+    S.cfg[k] = v; aplicar();
+  } else if (t.dataset.pav != null) {
+    const p = S.pavs[+t.dataset.pav], q = Math.max(0, Math.min(40, Math.round(+t.value || 0)));
+    const maior = Math.max(0, ...Object.keys(S.feitos).filter(k => k.startsWith(p.n + '-') && !k.endsWith('H')).map(k => +k.split('-')[1]));
+    if (q < maior) { toast(`O ${p.n}º pavimento já tem o apto ${p.n}${String(maior).padStart(2, '0')} concluído.`, true); return desenhar(false); }
+    p.q = q; aplicar();
+  } else if (t.dataset.sim) { sim[t.dataset.sim] = t.value; desenhar(false); }
+  else if (t.id === 'arq' && t.files[0]) {
+    t.files[0].text().then(txt => { const n = JSON.parse(txt); if (!n.cfg || !n.pavs || !n.equipes || !n.feitos) throw 0;
+      confirmar('Restaurar este backup?', `O backup tem ${Object.keys(n.feitos).length} unidades concluídas e ${n.equipes.length} equipes. Ele substitui tudo o que está neste navegador.`, 'Restaurar', () => { DEMO = false; S = n; fecharJanela(); aplicar(() => 'Backup restaurado.'); });
+    }).catch(() => toast('Esse arquivo não é um backup válido.', true));
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharJanela(); });
+// dica ao passar o mouse
+const dica = $('#dica');
+document.addEventListener('pointerover', e => { const el = e.target.closest('[data-dica]'); if (!el) return dica.classList.remove('on'); dica.textContent = el.dataset.dica; const r = el.getBoundingClientRect(); dica.classList.add('on');
+  const w = dica.offsetWidth, h = dica.offsetHeight; dica.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px'; dica.style.top = (r.top - h - 8 < 70 ? r.bottom + 8 : r.top - h - 8) + 'px'; });
+let tRes; addEventListener('resize', () => { clearTimeout(tRes); tRes = setTimeout(() => desenhar(false), 150); });
+
+/* =====================================================================
+   I. DADOS DE EXEMPLO (só para ver como fica; nunca são gravados)
+   ===================================================================== */
+function estadoExemplo() {
+  const E = estadoPadrao(), hoje = dn(agora().d); let ini = hoje - 45; while (new Date(ini * 864e5).getUTCDay() !== 1) ini--;
+  E.conferido = true; E.cfg.inicio = dnIso(ini); E.cfg.prazo = dnIso(hoje + 60);
+  const ritmos = [3.3, 3.9, 4.5, 3.6, 5.2, 4.1];
+  E.equipes = ritmos.map((r, i) => ({ id: 'e' + (i + 1), nome: i < 4 ? 'Equipe ' + (i + 1) : 'Terceirizada ' + 'AB'[i - 4], tipo: i < 4 ? 'fixa' : 'terceirizada', cor: i, ativa: true, entrada: i < 4 ? '' : dnIso(ini + 14), pausas: [] }));
+  E.seq = 7;
+  let sem = 7; const rnd = () => { sem = (sem * 1103515245 + 12345) % 2147483648; return sem / 2147483648; };
+  const c = contexto(E), fila = [...c.unidades], t = E.equipes.map(e => c.st[e.id].ini0);
+  for (;;) { let k = 0; for (let i = 1; i < t.length; i++) if (t[i] < t[k]) k = i;
+    const u = fila[0]; if (!u) break; const fim = t[k] + ritmos[k] * u.peso * (.8 + rnd() * .45); if (fim > c.now - .5) break;
+    fila.shift(); const s = c.cal.em(fim); E.feitos[u.id] = { d: s.d, t: s.t, e: E.equipes[k].id }; t[k] = fim; }
+  return E;
+}
+
+/* =====================================================================
+   J. INÍCIO
+   ===================================================================== */
+Esfera.criar(); logoEsfera(); desenhar(true);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => desenhar(false));
+</script>
+</body>
+</html>
