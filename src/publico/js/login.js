@@ -6,7 +6,7 @@ const form = document.querySelector('form'), erro = document.querySelector('#err
 form.addEventListener('submit', async ev => {
   ev.preventDefault(); botao.disabled = true; erro.textContent = '';
   try {
-    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: form.senha.value }) });
+    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: form.usuario.value, senha: form.senha.value }) });
     if (r.ok) return location.href = '/';
     erro.textContent = (await r.json()).erro || 'Não foi possível entrar.';
   } catch { erro.textContent = 'Sem conexão. Tente de novo.'; }

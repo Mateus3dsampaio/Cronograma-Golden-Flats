@@ -22,9 +22,9 @@ export function aplicar(msgFn, popId) {
 }
 const nomeUn = id => esc(app.R.c.porId.get(id).nome);
 
-/** Tudo o que muda a obra passa por aqui. */
+/** Tudo o que muda a obra passa por aqui. Em concluir, "por" e "em" são só para a tela mostrar na hora: quem vale é o servidor. */
 export const acoes = {
-  concluir(id, d, t, e) { const S = app.S; S.feitos[id] = { d, t, e }; delete S.fixos[id]; fecharJanela(); aplicar(() => `<b>${nomeUn(id)}</b> concluído · ${fCurta(d)} ${TURNO[t]}`, id); },
+  concluir(id, d, t, e) { const S = app.S; S.feitos[id] = { d, t, e, por: app.usuario.nome, em: new Date().toISOString() }; delete S.fixos[id]; fecharJanela(); aplicar(() => `<b>${nomeUn(id)}</b> concluído · ${fCurta(d)} ${TURNO[t]}`, id); },
   desfazer(id) { delete app.S.feitos[id]; fecharJanela(); aplicar(() => `Conclusão de <b>${nomeUn(id)}</b> desfeita`); },
   reservar(id, e) { if (e) app.S.fixos[id] = e; else delete app.S.fixos[id]; fecharJanela(); aplicar(() => e ? `<b>${nomeUn(id)}</b> reservado para ${esc(eq(e).nome)}` : 'Reserva retirada'); },
   novaEquipe(nome, tipo, entrada) {

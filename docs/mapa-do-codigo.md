@@ -19,7 +19,9 @@ Três partes, cada uma numa pasta de `src/`:
 | Visual de uma tela | `src/publico/css/telas.css` |
 | Conteúdo de uma tela | `src/publico/js/ui/telas/<tela>.js` |
 | O que um botão faz | `src/publico/js/ui/eventos.js` e `acoes.js` |
-| Senha e tempo de acesso | `src/servidor/autenticacao.js` |
+| Usuários, senha e tempo de acesso | `src/servidor/autenticacao.js` |
+| O texto de cada linha do registro de atividades | `src/servidor/atividades.js` |
+| A tela do registro de atividades | `src/publico/js/ui/telas/atividades.js` |
 | Como e onde os dados são gravados | `src/servidor/armazenamento.js` |
 
 ## Lógica (`src/compartilhado/`)
@@ -36,9 +38,10 @@ Três partes, cada uma numa pasta de `src/`:
 | Arquivo | O que faz |
 |---|---|
 | `index.js` | Liga o servidor |
-| `app.js` | Rotas: páginas, `/api/login`, `/api/estado`, `/api/cliente/...`, `/saude` |
-| `autenticacao.js` | Senha única, cookie de 90 dias, limite de 5 erros em 15 min |
-| `armazenamento.js` | Grava `obra.json` no Volume, controla versão (dois aparelhos) e a cópia diária |
+| `app.js` | Rotas: páginas, `/api/login`, `/api/estado`, `/api/atividades`, `/api/usuarios`, `/api/cliente/...`, `/saude` |
+| `autenticacao.js` | Login por usuário e senha (administrador pela variável `SENHA`, demais com senha embaralhada), cookie de 90 dias, limite de 5 erros em 15 min |
+| `atividades.js` | Compara a obra antes e depois de cada gravação: descreve o que mudou e carimba quem marcou cada conclusão e quando |
+| `armazenamento.js` | Grava no Volume a obra (`obra.json`), os usuários e o registro de atividades; controla versão (dois aparelhos) e a cópia diária |
 | `config.js` | Variáveis de ambiente e "que dia é hoje" no fuso da obra |
 
 ## Tela (`src/publico/`)
@@ -62,7 +65,8 @@ Três partes, cada uma numa pasta de `src/`:
 | `js/ui/janelas.js` | Janelas (unidade, equipe, confirmar) e avisos |
 | `js/ui/esfera.js` / `grafico.js` | Esfera de pontos e gráfico de avanço |
 | `js/ui/tabela-cliente.js` | Tabela de pavimentos (aba Cliente e página pública) |
-| `js/ui/telas/*.js` | Uma tela por arquivo |
+| `js/ui/telas/*.js` | Uma tela por arquivo (acompanhamento, cronograma, equipes, simulador, cliente, atividades, configurações) |
+| `js/ui/formato.js` | Formatos de tela: selo de atraso, dias por apto, data e hora em Fortaleza, "Marcado por…" |
 
 ## Testes (`testes/`)
-`npm test` roda `previsao.test.js` (contas) e `servidor.test.js` (senha, gravação, link do cliente).
+`npm test` roda `previsao.test.js` (contas), `atividades.test.js` (textos do registro e carimbo) e `servidor.test.js` (login, usuários, gravação, registro, link do cliente).

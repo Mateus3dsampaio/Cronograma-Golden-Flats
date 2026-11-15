@@ -7,7 +7,7 @@ const ROT = ['não trabalha', 'só manhã', 'dia inteiro'];
 
 /** Aba Configurações: dados da obra, dias de trabalho, feriados, pavimentos e backup. */
 export function configuracoes() {
-  const { S, DEMO } = app, c = S.cfg, totA = S.pavs.reduce((s, p) => s + p.q, 0);
+  const { S, DEMO } = app, adm = app.usuario.admin, c = S.cfg, totA = S.pavs.reduce((s, p) => s + p.q, 0);
   return `<div class="grade cfg entra">
     <div class="grade">
       <div class="card"><div class="rot"><span>Obra</span>${S.conferido ? '' : '<button class="btn mini pri" data-a="conferido">Já conferi os dados</button>'}</div><div class="form">
@@ -30,7 +30,17 @@ export function configuracoes() {
         <div class="linha" style="margin-top:14px"><button class="btn mini" data-a="pav-add">+ Pavimento</button><button class="btn mini" data-a="pav-del" ${S.pavs.length > 1 ? '' : 'disabled'}>Remover o último</button><span class="mudo" style="font-size:12px">Numeração: 3º pavimento = 301, 302… Cada pavimento tem 1 hall.</span></div></div>
       <div class="card"><div class="rot">Dados e backup</div>
         <p class="mudo" style="margin-bottom:14px">Os dados ficam no servidor e aparecem iguais no celular e no computador. O servidor guarda sozinho uma cópia por dia (últimos 30 dias). Baixar um backup de vez em quando continua sendo uma boa garantia extra.</p>
-        <div class="linha"><button class="btn pri" data-a="backup">Baixar backup</button><button class="btn" data-a="restaurar">Restaurar backup</button><input type="file" id="arq" accept=".json" hidden>
-          <button class="btn" data-a="demo">${DEMO ? 'Sair do exemplo' : 'Ver com dados de exemplo'}</button><button class="btn perigo" data-a="zerar">Zerar tudo</button></div></div>
+        <div class="linha"><button class="btn pri" data-a="backup">Baixar backup</button>${adm ? '<button class="btn" data-a="restaurar">Restaurar backup</button><input type="file" id="arq" accept=".json" hidden>' : ''}
+          <button class="btn" data-a="demo">${DEMO ? 'Sair do exemplo' : 'Ver com dados de exemplo'}</button>${adm ? '<button class="btn perigo" data-a="zerar">Zerar tudo</button>' : ''}</div></div>
+      ${adm && !DEMO ? usuarios() : ''}
     </div></div>`;
+}
+
+/** Cartão de usuários (só o administrador vê). */
+function usuarios() {
+  const lista = app.usuarios;
+  return `<div class="card"><div class="rot">Usuários · cada pessoa entra com o próprio nome e senha</div>
+    <div class="usuarios">${!lista ? '<span class="mudo">Carregando…</span>' : lista.map(u => `<div class="usuario"><b>${esc(u.nome)}</b>${u.admin ? '<span class="selo mc">administrador</span><span class="mudo" style="font-size:12px">senha na variável SENHA do Railway</span>' : `<span class="selo nt">usuário</span><span class="rod"><button class="btn mini" data-a="usuario-senha" data-nome="${esc(u.nome)}">Trocar senha</button><button class="btn mini perigo" data-a="usuario-remover" data-nome="${esc(u.nome)}">Remover</button></span>`}</div>`).join('')}</div>
+    <div class="nova" style="grid-template-columns:1fr 1fr auto;margin-top:14px"><label class="campo">Nome<input id="nu-nome" maxlength="30" autocomplete="off"></label><label class="campo">Senha (mínimo 6)<input id="nu-senha" type="password" autocomplete="new-password"></label><button class="btn pri" data-a="usuario-novo">Adicionar usuário</button></div>
+    <p class="mudo" style="margin-top:12px;font-size:12px">Usuários marcam conclusões, cuidam das equipes e mudam configurações. Só o administrador cria usuários, restaura backup, zera a obra e troca o link do cliente. Tudo o que cada um faz fica na aba Atividades.</p></div>`;
 }

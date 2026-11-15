@@ -1,16 +1,24 @@
 import { app, agora, eq } from '../nucleo/contexto.js';
-import { carregar, novoLinkCliente, sair } from '../nucleo/api.js';
+import { carregar, novoLinkCliente, sair, carregarAtividades, carregarUsuarios, salvarUsuario, removerUsuario } from '../nucleo/api.js';
 import { estadoPadrao, estadoValido } from '/compartilhado/estado-padrao.js';
 import { estadoExemplo } from '/compartilhado/exemplo.js';
 import { textoCliente } from '/compartilhado/cliente.js';
 import { $, esc } from './dom.js';
 import { desenhar } from './desenhar.js';
 import { acoes, aplicar } from './acoes.js';
-import { toast, fecharJanela, confirmar, janelaUnidade, janelaEquipe } from './janelas.js';
+import { toast, fecharJanela, confirmar, abrirJanela, janelaUnidade, janelaEquipe } from './janelas.js';
 
 // Feriados nacionais fixos + Sexta-feira Santa. Carnaval, Corpus Christi e feriados locais o Mateus adiciona à mão.
 const FERIADOS_NACIONAIS = ['2026-11-20', '2026-12-25', '2027-01-01', '2027-03-26', '2027-04-21', '2027-05-01', '2027-09-07', '2027-10-12', '2027-11-02', '2027-11-15', '2027-11-20', '2027-12-25'];
 const copiar = (txt, ok) => navigator.clipboard.writeText(txt).then(() => toast(ok), () => toast('Não consegui copiar neste navegador.', true));
+
+/** Abas que mostram dados buscados na hora: busca e redesenha quando chegar. */
+export function buscarDadosDaAba() {
+  if (app.DEMO) return;
+  if (app.aba === 'ativ') carregarAtividades().then(() => app.aba === 'ativ' && desenhar(false));
+  if (app.aba === 'config' && app.usuario.admin && !app.usuarios) carregarUsuarios().then(() => app.aba === 'config' && desenhar(false));
+}
+const resultadoUsuario = (erro, ok) => { if (erro) return toast(erro, true); fecharJanela(); desenhar(false); toast(ok); };
 
 /** Cada botão da tela tem data-a="nome da ação"; aqui está o que cada um faz. */
 const cliques = {
@@ -18,6 +26,11 @@ const cliques = {
   fechar: () => fecharJanela(),
   unidade: d => janelaUnidade(d.u, d.e),
   ir: d => { app.aba = d.aba; desenhar(true); },
+  'filtro-ativ': d => { app.filtroAtiv = d.v; desenhar(false); },
+  // usuários (só o administrador)
+  'usuario-novo': async () => { const n = $('#nu-nome').value.trim(); resultadoUsuario(await salvarUsuario(n, $('#nu-senha').value), `Usuário <b>${esc(n)}</b> criado. Passe o nome e a senha para a pessoa.`); },
+  'usuario-senha': d => { abrirJanela(`<h3>Trocar senha de ${esc(d.nome)}</h3><label class="campo">Nova senha (mínimo 6)<input type="password" id="ts-senha" autocomplete="new-password"></label><p class="mudo">Os aparelhos em que ${esc(d.nome)} está conectada vão pedir a senha nova.</p><div class="rod"><button class="btn" data-a="fechar">Cancelar</button><button class="btn pri" id="ts-ok">Trocar senha</button></div>`); $('#ts-ok').onclick = async () => resultadoUsuario(await salvarUsuario(d.nome, $('#ts-senha').value), `Senha de <b>${esc(d.nome)}</b> trocada.`); },
+  'usuario-remover': d => confirmar('Remover ' + esc(d.nome) + '?', 'A pessoa perde o acesso na hora. O que ela já marcou continua registrado no nome dela.', 'Remover usuário', async () => resultadoUsuario(await removerUsuario(d.nome), `Usuário <b>${esc(d.nome)}</b> removido.`), true),
   'gantt-hoje': () => $('#gantt').scrollTo({ left: Math.max(0, $('#g-hoje').offsetLeft - 420), behavior: 'smooth' }),
   sair: () => sair(),
   // equipes
@@ -72,7 +85,7 @@ function aoMudar(ev) {
 export function ligarEventos() {
   document.addEventListener('click', ev => {
     const ab = ev.target.closest('[data-aba]');
-    if (ab && !ab.dataset.a) { app.aba = ab.dataset.aba; scrollTo(0, 0); return desenhar(true); }
+    if (ab && !ab.dataset.a) { app.aba = ab.dataset.aba; scrollTo(0, 0); desenhar(true); return buscarDadosDaAba(); }
     const b = ev.target.closest('[data-a]'); if (b && cliques[b.dataset.a]) cliques[b.dataset.a](b.dataset, ev, b);
   });
   document.addEventListener('change', aoMudar);

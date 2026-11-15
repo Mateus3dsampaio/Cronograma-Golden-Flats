@@ -2,7 +2,8 @@ import path from 'node:path';
 
 /**
  * Configuração do servidor: tudo vem de variáveis de ambiente (no Railway: aba Variables).
- * SENHA        senha de acesso ao cronograma (obrigatória no Railway)
+ * SENHA        senha do administrador (obrigatória no Railway)
+ * ADMIN_NOME   nome de usuário do administrador (padrão: Mateus)
  * PASTA_DADOS  onde gravar os dados; no Railway vem sozinha do Volume
  * FUSO         fuso da obra, para saber que dia é "hoje"
  */
@@ -11,6 +12,7 @@ const volume = process.env.RAILWAY_VOLUME_MOUNT_PATH;
 export const config = {
   porta: +process.env.PORT || 3000,
   senha: process.env.SENHA || '',
+  adminNome: process.env.ADMIN_NOME || 'Mateus', // o administrador entra com este nome e a SENHA
   pastaDados: process.env.PASTA_DADOS || volume || path.resolve('dados'),
   fuso: process.env.FUSO || 'America/Fortaleza',
   /** No Railway sem Volume os dados somem a cada publicação. A tela avisa. */

@@ -16,6 +16,6 @@ export function cliente() {
     <p class="mudo" style="margin-top:14px;font-size:12px">Datas previstas com base no andamento real da montagem; podem ser ajustadas conforme a obra avança.${mg ? ` <span class="nao-imp">(Inclui ${plural(mg, 'dia útil', 'dias úteis')} de margem sobre a previsão interna.)</span>` : ' <span class="nao-imp">(Sem margem: são as mesmas datas da previsão interna. Recomendo passar ao cliente com alguns dias de folga.)</span>'}</p></div>
     ${DEMO ? '' : `<div class="card nao-imp"><div class="rot">Link do cliente · só leitura, sem senha</div>
       <p class="mudo" style="margin-bottom:12px">Quem abrir este link vê apenas esta tabela, sempre atualizada, já com a margem de segurança. Não vê equipes, ritmo nem o restante do sistema. "Gerar novo link" faz o link antigo parar de funcionar.</p>
-      <div class="linha"><label class="campo" style="flex:1;min-width:260px"><input readonly id="link-cliente" value="${esc(link)}"></label><button class="btn pri" data-a="copiar-link">Copiar link</button><button class="btn" data-a="novo-link">Gerar novo link</button></div></div>`}
+      <div class="linha"><label class="campo" style="flex:1;min-width:260px"><input readonly id="link-cliente" value="${esc(link)}"></label><button class="btn pri" data-a="copiar-link">Copiar link</button>${app.usuario.admin ? '<button class="btn" data-a="novo-link">Gerar novo link</button>' : ''}</div></div>`}
   </div>`;
 }

@@ -120,3 +120,6 @@
 .pavs-cfg label{display:grid;gap:4px;font-size:11px;color:var(--fraco);font-weight:600}
 .pavs-cfg input{height:36px;text-align:center;border-radius:9px;background:#0d141f;border:1px solid var(--borda2);font-weight:700;width:100%}
 .linha{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.usuarios{display:grid;gap:8px}
+.usuario{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:#111922;border:1px solid var(--borda)}
+.usuario .rod{margin-left:auto;display:flex;gap:8px}

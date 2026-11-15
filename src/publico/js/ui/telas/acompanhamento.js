@@ -1,7 +1,7 @@
 import { app, eq } from '../../nucleo/contexto.js';
 import { fData, fCurta, fSem, TURNO, num, plural } from '/compartilhado/datas.js';
 import { esc, cor } from '../dom.js';
-import { seloAtraso, diasApto } from '../formato.js';
+import { seloAtraso, diasApto, marcadoPor } from '../formato.js';
 
 /** Aba Acompanhamento: situação em uma frase, números, mapa do edifício, gráfico e ranking das equipes. */
 export function acompanhamento() {
@@ -62,7 +62,7 @@ function predio() {
   const cel = u => {
     const f = c.feito.get(u.id), e = R.emAnd.get(u.id), pl = prev && prev.plano.get(u.id), rot = u.tipo === 'hall' ? 'HALL' : u.nome;
     let cls = 'cel' + (u.tipo === 'hall' ? ' hall' : ''), est = `style="--i:${i++}"`, dica;
-    if (f) { cls += ' ok t' + f.t; dica = `${u.nome}\nConcluído ${fSem(f.d)} · ${TURNO[f.t]}\n${eq(f.e) ? eq(f.e).nome : ''}`; }
+    if (f) { cls += ' ok t' + f.t; dica = `${u.nome}\nConcluído ${fSem(f.d)} · ${TURNO[f.t]}\n${eq(f.e) ? eq(f.e).nome : ''}${f.por ? '\n' + marcadoPor(f) : ''}`; }
     else if (e) { cls += ' and'; est = `style="--c:${cor(eq(e))};--i:${i}"`; const s = c.cal.em(pl.fim); dica = `${u.nome}\nEm montagem · ${eq(e).nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}`; }
     else if (pl) { const s = c.cal.em(pl.fim), q = eq(pl.eq); dica = `${u.nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}\n${q ? q.nome : ''}${S.fixos[u.id] ? ' (reservado)' : ''}`; }
     else dica = `${u.nome}\nSem previsão`;

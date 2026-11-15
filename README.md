@@ -12,7 +12,8 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 - **Equipes**: cadastrar, editar, retirar e reativar. O cronograma se refaz na hora.
 - **Simulador**: quantas equipes são necessárias para terminar numa data.
 - **Cliente**: previsão de liberação de cada pavimento, link só de leitura para o cliente, impressão e texto para WhatsApp.
-- **Configurações**: datas, dias de trabalho, feriados, apartamentos por pavimento, backup.
+- **Atividades**: registro de quem fez o quê, com data e hora de Fortaleza.
+- **Configurações**: datas, dias de trabalho, feriados, apartamentos por pavimento, backup e usuários (só o administrador).
 
 ## Como a previsão é calculada
 - A obra é contada em turnos (manhã e tarde) dos dias trabalhados.

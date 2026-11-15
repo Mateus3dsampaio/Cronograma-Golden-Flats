@@ -7,7 +7,7 @@ import { app } from './contexto.js';
 let versao = 0, pendente = false, enviando = false, relogio;
 export const api = { aoStatus: () => { }, aoReceber: () => { } };
 
-function receber(j) { versao = j.versao; app.S = j.estado; app.tokenCliente = j.tokenCliente; app.persistente = j.persistente; }
+function receber(j) { versao = j.versao; app.S = j.estado; app.tokenCliente = j.tokenCliente; app.persistente = j.persistente; app.usuario = j.usuario; app.fuso = j.fuso; }
 const irLogin = () => { location.href = '/login'; };
 
 export async function carregar() {
@@ -48,4 +48,17 @@ export async function novoLinkCliente() {
   const r = await fetch('/api/cliente/novo-link', { method: 'POST' }); if (!r.ok) throw new Error();
   app.tokenCliente = (await r.json()).tokenCliente; versao++;
 }
+/** Registro de atividades (as mais recentes primeiro). */
+export async function carregarAtividades() { const r = await fetch('/api/atividades'); if (r.ok) app.atividades = await r.json(); }
+
+/** Usuários: listar, criar ou trocar senha, remover (só o administrador). Devolve a mensagem de erro, se houver. */
+async function usuarios(caminho = '', opcoes) {
+  const r = await fetch('/api/usuarios' + caminho, opcoes), j = await r.json().catch(() => ({}));
+  if (!r.ok) return j.erro || 'Não foi possível concluir.';
+  app.usuarios = j; return null;
+}
+export const carregarUsuarios = () => usuarios();
+export const salvarUsuario = (nome, senha) => usuarios('', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, senha }) });
+export const removerUsuario = nome => usuarios('/' + encodeURIComponent(nome), { method: 'DELETE' });
+
 export async function sair() { await fetch('/api/sair', { method: 'POST' }); irLogin(); }

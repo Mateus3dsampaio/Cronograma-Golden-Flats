@@ -10,8 +10,9 @@ import { equipes } from './telas/equipes.js';
 import { simulador } from './telas/simulador.js';
 import { cliente } from './telas/cliente.js';
 import { configuracoes } from './telas/configuracoes.js';
+import { atividades } from './telas/atividades.js';
 
-const telas = { acomp: acompanhamento, crono: cronograma, equipes, simul: simulador, cliente, config: configuracoes };
+const telas = { acomp: acompanhamento, crono: cronograma, equipes, simul: simulador, cliente, ativ: atividades, config: configuracoes };
 
 /** Refaz as contas e redesenha a aba aberta. `animar` = entrada com animação (troca de aba). */
 export function desenhar(animar) {
@@ -27,6 +28,7 @@ export function desenhar(animar) {
   if (app.aba === 'crono') { const g = $('#gantt'); if (g) g.scrollLeft = gs != null && !animar ? gs : Math.max(0, $('#g-hoje').offsetLeft - 420); }
   if (animar) $$('[data-n]', tela).forEach(contar); else scrollTo(0, rolagem);
   $('#nome-obra').textContent = S.cfg.nome.toUpperCase(); document.title = S.cfg.nome + ' · Cronograma de montagem';
+  $('#usuario-txt').textContent = app.usuario.nome;
   $('#hoje-txt').textContent = fSem(R.c.ag.d) + '/' + R.c.ag.d.slice(0, 4);
   if (app.DEMO) $('#salvo').textContent = 'Modo exemplo (não grava)';
   $('#demo-faixa').innerHTML = app.DEMO ? '<div class="demo-faixa">MODO EXEMPLO · dados fictícios para você ver como fica. Nada aqui é gravado.<button data-a="demo">Sair do exemplo</button></div>' : '';

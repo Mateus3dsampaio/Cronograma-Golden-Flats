@@ -2,6 +2,7 @@ import { app, eq } from '../nucleo/contexto.js';
 import { fSem, TURNO } from '/compartilhado/datas.js';
 import { $, $$, esc, cor } from './dom.js';
 import { acoes } from './acoes.js';
+import { marcadoPor } from './formato.js';
 
 /** Aviso que aparece no canto e some sozinho. */
 export function toast(html, erro) {
@@ -22,7 +23,7 @@ export function janelaUnidade(id, eqSug) {
   const lista = S.equipes.filter(e => e.ativa || e.id === sel || c.st[e.id].peso);
   const sl = pl && c.cal.em(pl.fim);
   abrirJanela(`<h3>${u.tipo === 'hall' ? esc(u.nome) : 'Apto ' + esc(u.nome)} <small>${u.pav}º pavimento</small></h3>
-    <div>${f ? `<span class="selo ok">✓ Concluído ${fSem(f.d)} · ${TURNO[f.t]}</span>` : R.emAnd.has(id) ? `<span class="selo mc">Em montagem · previsão ${fSem(sl.d)} ${TURNO[sl.t]}</span>` : sl ? `<span class="selo nt">Previsão ${fSem(sl.d)} · ${TURNO[sl.t]}</span>` : '<span class="selo nt">Sem previsão</span>'}</div>
+    <div>${f ? `<span class="selo ok">✓ Concluído ${fSem(f.d)} · ${TURNO[f.t]}</span>` : R.emAnd.has(id) ? `<span class="selo mc">Em montagem · previsão ${fSem(sl.d)} ${TURNO[sl.t]}</span>` : sl ? `<span class="selo nt">Previsão ${fSem(sl.d)} · ${TURNO[sl.t]}</span>` : '<span class="selo nt">Sem previsão</span>'}${f && f.por ? `<p class="mudo" style="margin-top:8px;font-size:13px">${esc(marcadoPor(f))}</p>` : ''}</div>
     <div class="campo">Equipe que montou<div class="chips" id="ju-eq">${lista.map(e => `<button type="button" class="${e.id === sel ? 'on' : ''}" style="--c:${cor(e)}" data-e="${e.id}"><i class="ponto" style="color:${cor(e)};background:${cor(e)}"></i>${esc(e.nome)}${e.ativa ? '' : ' (saiu)'}</button>`).join('') || '<span class="mudo">Cadastre uma equipe primeiro.</span>'}</div></div>
     <div class="form"><label class="campo">Concluído em<input type="date" id="ju-data" value="${f ? f.d : ag.d}" max="${ag.d}"></label>
       <div class="campo">Turno<div class="seg" id="ju-turno"><button type="button" class="${(f ? f.t : ag.t) === 0 ? 'on' : ''}" data-t="0">Manhã</button><button type="button" class="${(f ? f.t : ag.t) === 1 ? 'on' : ''}" data-t="1">Tarde</button></div></div></div>

@@ -8,6 +8,9 @@ export const app = {
   aba: 'acomp',
   sim: { alvo: '', entrada: '' }, // campos do simulador (não são gravados)
   tokenCliente: '', persistente: true,
+  usuario: { nome: '', admin: false }, fuso: 'America/Fortaleza',
+  usuarios: null,         // lista de usuários (só o administrador carrega)
+  atividades: null, filtroAtiv: '', // registro de atividades e o filtro por pessoa
 };
 
 /** Hoje e o turno atual. `?hoje=2027-01-15` na barra de endereço simula outra data (para testar). */
