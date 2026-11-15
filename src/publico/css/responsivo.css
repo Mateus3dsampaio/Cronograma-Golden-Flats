@@ -10,7 +10,7 @@
   .veredito{flex-wrap:wrap}.veredito .acoes{margin-left:0}
   .sl{grid-template-columns:70px 1fr 90px}.sl>:last-child{display:none}
 }
-@media (max-width:640px){.kpis,.form{grid-template-columns:1fr}.heroi{grid-template-columns:1fr;justify-items:center;text-align:center}.heroi canvas{margin:0}}
+@media (max-width:640px){.kpis,.form{grid-template-columns:1fr}.heroi{grid-template-columns:1fr;justify-items:center;text-align:center}#lugar-predio{width:min(100%,270px);height:360px;margin:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @media print{
   body{background:#fff;color:#111}body::before,body::after,.topo,.demo-faixa,.toasts,.nao-imp{display:none!important}

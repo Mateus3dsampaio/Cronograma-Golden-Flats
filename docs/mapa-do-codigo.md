@@ -15,6 +15,8 @@ Três partes, cada uma numa pasta de `src/`:
 | Dias de trabalho, feriados, contagem de turnos | `src/compartilhado/calendario.js` |
 | Valores iniciais da obra (pavimentos, dias por apto, equipes) | `src/compartilhado/estado-padrao.js` |
 | O que o cliente vê e o texto do WhatsApp | `src/compartilhado/cliente.js` |
+| A forma do prédio 3D (curva, fenda, altura dos andares, base, topo) | `src/publico/js/ui/predio3d/forma.js` |
+| Cores, luz, giro e zoom do prédio 3D | `src/publico/js/ui/predio3d/cena.js` |
 | Cores, sombras, fontes | `src/publico/css/tokens.css` |
 | Visual de uma tela | `src/publico/css/telas.css` |
 | Conteúdo de uma tela | `src/publico/js/ui/telas/<tela>.js` |
@@ -38,7 +40,7 @@ Três partes, cada uma numa pasta de `src/`:
 | Arquivo | O que faz |
 |---|---|
 | `index.js` | Liga o servidor |
-| `app.js` | Rotas: páginas, `/api/login`, `/api/estado`, `/api/atividades`, `/api/usuarios`, `/api/cliente/...`, `/saude` |
+| `app.js` | Rotas: páginas, `/api/login`, `/api/estado`, `/api/atividades`, `/api/usuarios`, `/api/cliente/...`, `/saude`, `/vendor/three/...` (biblioteca do prédio 3D, vinda de `node_modules`) |
 | `autenticacao.js` | Login por usuário e senha (administrador pela variável `SENHA`, demais com senha embaralhada), cookie de 90 dias, limite de 5 erros em 15 min |
 | `atividades.js` | Compara a obra antes e depois de cada gravação: descreve o que mudou e carimba quem marcou cada conclusão e quando |
 | `armazenamento.js` | Grava no Volume a obra (`obra.json`), os usuários e o registro de atividades; controla versão (dois aparelhos) e a cópia diária |
@@ -63,7 +65,10 @@ Três partes, cada uma numa pasta de `src/`:
 | `js/ui/acoes.js` | Tudo o que muda a obra (concluir, equipes…) |
 | `js/ui/eventos.js` | O que cada botão e campo faz |
 | `js/ui/janelas.js` | Janelas (unidade, equipe, confirmar) e avisos |
-| `js/ui/esfera.js` / `grafico.js` | Esfera de pontos e gráfico de avanço |
+| `js/ui/esfera.js` / `grafico.js` | Esfera de pontos (logo, entrada e reserva do prédio 3D em aparelho sem WebGL) e gráfico de avanço |
+| `js/ui/predio3d/forma.js` | Proporções do prédio: planta da torre dividida em partes iguais (uma por unidade), base e alturas. Sem Three.js |
+| `js/ui/predio3d/cena.js` | Prédio 3D com Three.js: volumes, cores por unidade, giro automático, arrastar, zoom, etiqueta e clique no pavimento |
+| `js/ui/predio3d/index.js` | Carrega o 3D só na aba Acompanhamento; se falhar, usa a esfera |
 | `js/ui/tabela-cliente.js` | Tabela de pavimentos (aba Cliente e página pública) |
 | `js/ui/telas/*.js` | Uma tela por arquivo (acompanhamento, cronograma, equipes, simulador, cliente, atividades, configurações) |
 | `js/ui/formato.js` | Formatos de tela: selo de atraso, dias por apto, data e hora em Fortaleza, "Marcado por…" |

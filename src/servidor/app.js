@@ -70,6 +70,11 @@ export function criarApp(arm) {
     res.set('Cache-Control', 'no-store').json(resumoCliente(o.estado, calcular(o.estado, agora())));
   });
 
+  // Three.js (prédio 3D): só os dois arquivos usados, direto da pasta da biblioteca
+  const three = path.join(raiz, '..', '..', 'node_modules', 'three');
+  app.get('/vendor/three/three.module.min.js', (req, res) => res.sendFile(path.join(three, 'build', 'three.module.min.js'), { maxAge: '7d' }));
+  app.get('/vendor/three/OrbitControls.js', (req, res) => res.sendFile(path.join(three, 'examples', 'jsm', 'controls', 'OrbitControls.js'), { maxAge: '7d' }));
+
   // Arquivos da tela e a lógica compartilhada (o navegador usa as mesmas contas do servidor)
   app.use('/compartilhado', express.static(path.join(raiz, '..', 'compartilhado')));
   app.use(express.static(publico, { index: false }));

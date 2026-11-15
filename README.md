@@ -7,7 +7,7 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 - **Onde fica cada coisa no código:** `docs/mapa-do-codigo.md`
 
 ## Telas
-- **Acompanhamento**: situação em uma frase, % concluído, previsão de término, ritmo, mapa do edifício (clique na unidade para marcar como concluída, com equipe, data e manhã/tarde), gráfico de avanço e ranking das equipes.
+- **Acompanhamento**: situação em uma frase, % concluído, prédio em 3D que acende conforme os pavimentos avançam (gira sozinho; arraste para girar, role para aproximar, clique num pavimento para ir até ele), previsão de término, ritmo, mapa do edifício (clique na unidade para marcar como concluída, com equipe, data e manhã/tarde), gráfico de avanço e ranking das equipes.
 - **Cronograma**: linha do tempo por equipe, dia dividido em manhã e tarde.
 - **Equipes**: cadastrar, editar, retirar e reativar. O cronograma se refaz na hora.
 - **Simulador**: quantas equipes são necessárias para terminar numa data.

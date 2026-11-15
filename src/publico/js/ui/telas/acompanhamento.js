@@ -35,11 +35,29 @@ function veredito() {
 /** Cartão da esfera com o % total (a esfera é encaixada depois, em desenhar.js). */
 function heroi() {
   const { R } = app;
-  return `<div class="card heroi"><div id="lugar-esfera"></div><div>
+  const { S, c } = { S: app.S, c: R.c }, emPav = S.pavs.filter(p => R.pav[p.n].feitos < R.pav[p.n].tot && (R.pav[p.n].feitos || R.pav[p.n].and)).length;
+  return `<div class="card heroi"><div id="lugar-predio"></div><div>
     <div class="rot">Montagem concluída</div>
     <div class="pct"><span data-n="${R.pct}" data-dec="1">${num(R.pct, 1)}</span><small>%</small></div>
-    <dl><dt>Apartamentos</dt><dd>${R.aptosFeitos} / ${R.aptosTot}</dd><dt>Halls</dt><dd>${R.hallsFeitos} / ${R.hallsTot}</dd><dt>Faltam</dt><dd>${plural(R.tot - R.feitas, 'unidade', 'unidades')}</dd></dl>
+    <div class="barra ${R.pct === 100 ? 'ok' : ''}" style="margin-top:12px"><i style="width:${R.pct}%"></i></div>
+    <dl><dt>Apartamentos</dt><dd>${R.aptosFeitos} / ${R.aptosTot}</dd><dt>Halls</dt><dd>${R.hallsFeitos} / ${R.hallsTot}</dd>
+      <dt>Em montagem</dt><dd>${plural(R.emAnd.size, 'unidade', 'unidades')}</dd><dt>Faltam</dt><dd>${plural(R.tot - R.feitas, 'unidade', 'unidades')}</dd>
+      <dt>Pav. liberados</dt><dd>${R.liberados} / ${S.pavs.length}</dd><dt>Pav. em andamento</dt><dd>${emPav}</dd>
+      ${R.proximo ? `<dt>Próximo a liberar</dt><dd>${R.proximo.n}º · ${fSem(c.cal.em(R.proximo.fimT).d)}</dd>` : ''}</dl>
+    <div class="legenda v3d-leg"><span><i style="background:#4b5d76;border-color:#62779a"></i>a fazer</span><span><i style="background:#4a80f0;border-color:#8aaaf0"></i>em montagem</span><span><i style="background:#3fc47c;border-color:#8ff0b5"></i>concluído</span></div>
+    <p class="v3d-dica nao-imp">Arraste para girar · role para aproximar · clique num pavimento para ir até ele</p>
   </div></div>`;
+}
+
+/** Dados de cada pavimento para o prédio 3D, de baixo para cima: estado de cada unidade e o texto da etiqueta. */
+export function pavimentos3d() {
+  const { S, R } = app, { c } = R;
+  return [...S.pavs].sort((a, b) => a.n - b.n).map(p => {
+    const info = R.pav[p.n], us = c.unidades.filter(u => u.pav === p.n), s = info.fimT ? c.cal.em(info.fimT) : null;
+    const estados = us.map(u => c.feito.has(u.id) ? 2 : R.emAnd.has(u.id) ? 1 : 0), and = estados.filter(x => x === 1).length;
+    const prev = info.feitos === info.tot ? `Liberado ${fCurta(s.d)}` : info.incerto || !s ? 'Sem previsão' : `Libera ${fSem(s.d)} · ${TURNO[s.t]}`;
+    return { n: p.n, estados, etiqueta: `<b>${p.n}º pavimento</b>${info.feitos} de ${info.tot} concluídas${and ? ` · ${and} em montagem` : ''}<br>${prev}` };
+  });
 }
 
 /** Os quatro números principais. */
@@ -72,7 +90,7 @@ function predio() {
     const info = R.pav[p.n], us = c.unidades.filter(u => u.pav === p.n), pc = info.tot ? info.feitos / info.tot * 100 : 0;
     const aptos = us.filter(u => u.tipo === 'apto'), hall = us.find(u => u.tipo === 'hall'), s = info.fimT ? c.cal.em(info.fimT) : null;
     const pv = info.feitos === info.tot ? `<span class="selo ok">✓ Liberado ${fCurta(s.d)}</span>` : info.incerto || !s ? '<span class="mudo">sem previsão</span>' : `libera <b>${fSem(s.d)}</b> · ${TURNO[s.t]}`;
-    return `<div class="pav"><div class="n">${p.n}º <small>pav</small></div>
+    return `<div class="pav" id="pav-${p.n}"><div class="n">${p.n}º <small>pav</small></div>
       <div class="cels" style="grid-template-columns:repeat(${maxQ},minmax(0,1fr)) 6px minmax(0,1.5fr)">${aptos.map(cel).join('')}${'<span></span>'.repeat(maxQ - aptos.length + 1)}${cel(hall)}</div>
       <div class="pg"><div class="barra ${pc === 100 ? 'ok' : ''}"><i style="width:${pc}%"></i></div><span class="dir">${num(pc)}%</span></div>
       <div class="pv">${pv}</div></div>`;

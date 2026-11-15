@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "description": "Cronograma de montagem do hotel Golden Flats (Eccellenza)",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/servidor/index.js",
     "dev": "node --watch src/servidor/index.js",
     "test": "node --test testes/*.test.js"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "three": "^0.170.0"
   }
 }

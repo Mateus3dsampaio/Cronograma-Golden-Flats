@@ -4,7 +4,8 @@ import { fSem, num } from '/compartilhado/datas.js';
 import { $, $$, semMovimento } from './dom.js';
 import { Esfera } from './esfera.js';
 import { grafico } from './grafico.js';
-import { acompanhamento } from './telas/acompanhamento.js';
+import { mostrarPredio } from './predio3d/index.js';
+import { acompanhamento, pavimentos3d } from './telas/acompanhamento.js';
 import { cronograma } from './telas/cronograma.js';
 import { equipes } from './telas/equipes.js';
 import { simulador } from './telas/simulador.js';
@@ -21,8 +22,10 @@ export function desenhar(animar) {
   tela.innerHTML = telas[app.aba]();
   if (!animar) $$('.entra', tela).forEach(e => e.classList.remove('entra'));
   if (app.aba === 'acomp') {
-    const l = $('#lugar-esfera'); l.appendChild(Esfera.cv);
-    Esfera.definir([...R.c.unidades].sort((a, b) => a.pav - b.pav).map(u => R.c.feito.has(u.id) ? 2 : R.emAnd.has(u.id) ? 1 : 0));
+    mostrarPredio($('#lugar-predio'), pavimentos3d(), irAoPavimento, l => { // sem 3D no aparelho: fica a esfera de pontos
+      l.classList.add('sem3d'); l.appendChild(Esfera.cv);
+      Esfera.definir([...R.c.unidades].sort((a, b) => a.pav - b.pav).map(u => R.c.feito.has(u.id) ? 2 : R.emAnd.has(u.id) ? 1 : 0));
+    });
     const g = $('#grafico'); g.innerHTML = grafico(g.clientWidth || 800, 280);
   }
   if (app.aba === 'crono') { const g = $('#gantt'); if (g) g.scrollLeft = gs != null && !animar ? gs : Math.max(0, $('#g-hoje').offsetLeft - 420); }
@@ -34,6 +37,13 @@ export function desenhar(animar) {
   $('#demo-faixa').innerHTML = app.DEMO ? '<div class="demo-faixa">MODO EXEMPLO · dados fictícios para você ver como fica. Nada aqui é gravado.<button data-a="demo">Sair do exemplo</button></div>' : '';
   $$('#abas button').forEach(b => b.classList.toggle('on', b.dataset.aba === app.aba));
   const on = $('#abas button.on'), ind = $('#abas i'); ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
+}
+
+/** Clique num pavimento do prédio 3D: rola até a linha dele no mapa de unidades e destaca. */
+function irAoPavimento(n) {
+  const el = $('#pav-' + n); if (!el) return;
+  el.scrollIntoView({ behavior: semMovimento() ? 'auto' : 'smooth', block: 'center' });
+  el.classList.remove('destaque'); void el.offsetWidth; el.classList.add('destaque');
 }
 
 /** Número que sobe de zero até o valor (elementos com data-n). */

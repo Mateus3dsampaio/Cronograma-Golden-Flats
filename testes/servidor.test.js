@@ -91,3 +91,10 @@ test('5 senhas erradas bloqueiam novas tentativas', async () => {
   for (let i = 0; i < 6; i++) ultimo = await fetch(base + '/api/login', json(null, { usuario: 'Mateus', senha: 'x' }));
   assert.equal(ultimo.status, 429);
 });
+
+test('entrega os arquivos do Three.js para o prédio 3D', async () => {
+  for (const arq of ['three.module.min.js', 'OrbitControls.js']) {
+    const r = await fetch(base + '/vendor/three/' + arq);
+    assert.equal(r.status, 200); assert.match(r.headers.get('content-type'), /javascript/);
+  }
+});
