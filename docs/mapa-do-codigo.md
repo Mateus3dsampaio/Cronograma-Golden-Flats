@@ -21,7 +21,7 @@ Três partes, cada uma numa pasta de `src/`:
 | A aba Pagamentos e o extrato em PDF | `src/publico/js/ui/telas/pagamentos.js` |
 | O mapa de modelos dos apartamentos | `src/publico/js/ui/telas/configuracoes.js` |
 | A logomarca Italínea | `src/publico/img/italinea.svg` (tamanho e posição em `css/moldura.css`) |
-| A forma do prédio 3D (curva, fenda, altura dos andares, base, topo) | `src/publico/js/ui/predio3d/forma.js` |
+| A forma do prédio 3D (raios das alas, divisas dos apartamentos, altura dos andares, base, topo, estacionamento) | `src/publico/js/ui/predio3d/forma.js` |
 | Cores, luz, giro e zoom do prédio 3D | `src/publico/js/ui/predio3d/cena.js` |
 | Cores, sombras, fontes | `src/publico/css/tokens.css` |
 | Visual de uma tela | `src/publico/css/telas.css` |
@@ -75,8 +75,8 @@ Três partes, cada uma numa pasta de `src/`:
 | `js/ui/eventos.js` | O que cada botão e campo faz |
 | `js/ui/janelas.js` | Janelas (unidade, equipe, confirmar) e avisos |
 | `js/ui/esfera.js` / `grafico.js` | Esfera de pontos (logo, entrada e reserva do prédio 3D em aparelho sem WebGL) e gráfico de avanço |
-| `js/ui/predio3d/forma.js` | Proporções do prédio: planta da torre dividida em partes iguais (uma por unidade), base e alturas. Sem Three.js |
-| `js/ui/predio3d/cena.js` | Prédio 3D com Three.js: volumes, cores por unidade, giro automático, arrastar, zoom, etiqueta e clique no pavimento |
+| `js/ui/predio3d/forma.js` | Forma do prédio em metros, tirada da planta de arquitetura (rev. 03, 10/02/2026): duas alas curvas com 7 apartamentos cada (01 a 14 no lugar real) e o hall no miolo; base, 19º pavimento, casa de máquinas e estacionamento. Sem Three.js |
+| `js/ui/predio3d/cena.js` | Prédio 3D com Three.js: um volume por unidade na posição da planta (vaga sem apartamento no contrato fica apagada), cores por estado, giro automático, arrastar, zoom, etiqueta e clique no pavimento |
 | `js/ui/predio3d/index.js` | Carrega o 3D só na aba Acompanhamento; se falhar, usa a esfera |
 | `js/ui/tabela-cliente.js` | Tabela de pavimentos (aba Cliente e página pública) |
 | `js/ui/telas/*.js` | Uma tela por arquivo (acompanhamento, cronograma, equipes, simulador, pagamentos, cliente, atividades, configurações) |

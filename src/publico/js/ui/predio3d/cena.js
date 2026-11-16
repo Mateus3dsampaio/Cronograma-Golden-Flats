@@ -1,24 +1,20 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { FORMA, partes, base, alturaTotal } from './forma.js';
+import { APTOS_POR_PAV, ALTURA, unidades, torre, estacionamento, alturaTotal, raioTorre } from './forma.js';
 import { semMovimento } from '../dom.js';
 
 /**
- * Prédio em 3D (Three.js): uma laje por pavimento, dividida em partes iguais, uma por unidade.
- * As partes acendem em verde (concluída) ou azul (em montagem), sempre a partir da ponta fina.
+ * Prédio em 3D (Three.js): em cada pavimento, um volume por unidade, no lugar em que ela fica na planta
+ * (apartamentos 01 a 14 nas duas alas curvas e o hall no miolo).
+ * Cada volume acende em verde (concluída) ou azul (em montagem). Apartamento fora do contrato fica apagado.
  * Gira sozinho devagar; arrastar gira, rolar ou pinçar dá zoom.
  */
 const COR = { fazer: 0x4b5d76, andamento: 0x4a80f0, feito: 0x3fc47c, neutro: 0x1d2835, miolo: 0x0d131b };
 
-/** Geometria de prismas retos: cada quadrilátero [x, z] sobe de y0 a y1. As paredes entre fatias vizinhas não são desenhadas (só as marcadas com `fim`). */
-function prismas(quads, y0, y1) {
-  const p = [], tri = (a, b, c) => p.push(...a, ...b, ...c);
-  for (const q of quads) {
-    const bx = q.map(([x, z]) => [x, y0, z]), tp = q.map(([x, z]) => [x, y1, z]);
-    tri(tp[0], tp[1], tp[2]); tri(tp[0], tp[2], tp[3]); tri(bx[0], bx[2], bx[1]); tri(bx[0], bx[3], bx[2]);
-    for (let i = 0; i < 4; i++) { if (i % 2 && !q.fim) continue; const j = (i + 1) % 4; tri(bx[i], bx[j], tp[j]); tri(bx[i], tp[j], tp[i]); }
-  }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); g.computeVertexNormals();
+/** Volume reto: o contorno (pontos [x, y] no chão) sobe de y0 a y1. */
+function volume(contorno, y0, y1) {
+  const g = new THREE.ExtrudeGeometry(new THREE.Shape(contorno.map(([x, y]) => new THREE.Vector2(x, y))), { depth: y1 - y0, bevelEnabled: false });
+  g.rotateX(-Math.PI / 2); g.translate(0, y0, 0); // o "cima da prancha" vira o fundo da cena; a altura vira o eixo vertical
   return g;
 }
 const material = cor => new THREE.MeshStandardMaterial({ color: cor, roughness: .62, metalness: .05, side: THREE.DoubleSide });
@@ -34,7 +30,7 @@ export function criarCena(aoClicar) {
   cena.add(new THREE.HemisphereLight(0xdbe7ff, 0x18202c, 1.5), cam);
   const sol = new THREE.DirectionalLight(0xffffff, 2.1); sol.position.set(-12, 10, 3); cam.add(sol); // a luz acompanha a câmera: o prédio nunca fica no escuro
 
-  const mat = { 0: material(COR.fazer), 1: material(COR.andamento), 2: material(COR.feito), neutro: material(COR.neutro), miolo: material(COR.miolo) };
+  const mat = { 0: material(COR.fazer), 1: material(COR.andamento), 2: material(COR.feito), neutro: material(COR.neutro), miolo: material(COR.miolo), fora: material(COR.neutro) };
   mat[1].emissive = new THREE.Color(COR.andamento); mat[2].emissive = new THREE.Color(COR.feito); mat[2].emissiveIntensity = .12;
 
   const ctl = new OrbitControls(cam, rnd.domElement), parado = semMovimento();
@@ -42,24 +38,24 @@ export function criarCena(aoClicar) {
 
   let predio = null, andares = [], assinatura = '', dados = [], nasceu = 0, larg = 0, alt = 0, sobre = null;
 
-  /** Monta os volumes. Só refaz quando muda a quantidade de pavimentos ou de unidades. */
+  /** Monta os volumes. Só refaz quando muda a quantidade de pavimentos. */
   function montar(pavs) {
     if (predio) { cena.remove(predio); predio.traverse(o => o.geometry && o.geometry.dispose()); }
     predio = new THREE.Group(); andares = []; cena.add(predio);
-    const n = pavs.length, F = FORMA, topoTorre = F.base + n * F.andar, b = base(), inteiro = partes(1)[0], geos = new Map();
-    const caixa = (x0, x1, z0, z1, y0, y1, m) => { const c = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); c.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); predio.add(c); };
-    // chão, base (térreo + mezanino), marquise, miolo escuro (dá a sombra das frestas) e topo
-    const chao = new THREE.Mesh(new THREE.CircleGeometry(7.4, 64), new THREE.MeshBasicMaterial({ color: 0x8aaaf0, transparent: true, opacity: .05 })); chao.rotation.x = -Math.PI / 2; chao.position.y = -.01; predio.add(chao);
-    caixa(b.x0, b.x1, b.z0, b.z1, 0, F.base - .12, mat.neutro);
-    predio.add(new THREE.Mesh(prismas(inteiro, 0, F.base - .12), mat.neutro), new THREE.Mesh(prismas(partes(1, -.22)[0], F.base - .12, F.base - .02), mat.neutro));
-    predio.add(new THREE.Mesh(prismas(partes(1, .12)[0], F.base - .02, topoTorre), mat.miolo));
-    predio.add(new THREE.Mesh(prismas(inteiro, topoTorre, topoTorre + .16), mat.neutro));
-    caixa(-1.5, 1.3, -1.1, 1.0, topoTorre + .16, topoTorre + F.topo, mat.neutro);
-    // pavimentos
+    const n = pavs.length, A = ALTURA, topoTorre = A.base + n * A.andar, e = estacionamento(), u = unidades();
+    const por = (m, y0, y1, recuo = 0) => torre(recuo).forEach(c => predio.add(new THREE.Mesh(volume(c, y0, y1), m)));
+    // chão, estacionamento, base (térreo + mezanino), marquise, miolo escuro (dá a sombra das frestas), 19º pavimento e casa de máquinas
+    const chao = new THREE.Mesh(new THREE.CircleGeometry(raioTorre() * 1.45, 64), new THREE.MeshBasicMaterial({ color: 0x8aaaf0, transparent: true, opacity: .05 })); chao.rotation.x = -Math.PI / 2; chao.position.y = -.01; predio.add(chao);
+    const est = new THREE.Mesh(new THREE.BoxGeometry(e.x1 - e.x0, e.altura, e.y1 - e.y0), mat.neutro); est.position.set((e.x0 + e.x1) / 2, e.altura / 2, -(e.y0 + e.y1) / 2); predio.add(est);
+    por(mat.neutro, 0, A.base - .12); por(mat.neutro, A.base - .12, A.base - .02, -.9);
+    por(mat.miolo, A.base - .02, topoTorre, .5);
+    por(mat.neutro, topoTorre, topoTorre + A.topo);
+    predio.add(new THREE.Mesh(volume(u.hall, topoTorre + A.topo, topoTorre + A.topo + A.maquinas), mat.neutro));
+    // pavimentos: os 14 apartamentos na ordem do número e, por último, o hall
+    const geos = [...u.aptos, u.hall].map(c => volume(c, 0, A.laje));
     pavs.forEach((p, i) => {
-      const q = p.estados.length; if (!geos.has(q)) geos.set(q, partes(q).map(qs => prismas(qs, 0, F.andar * F.laje)));
-      const g = new THREE.Group(); g.position.y = F.base + i * F.andar; g.userData = { i, y: g.position.y };
-      geos.get(q).forEach(geo => { const m = new THREE.Mesh(geo, mat[0]); m.userData.pav = i; g.add(m); });
+      const g = new THREE.Group(); g.position.y = A.base + i * A.andar; g.userData = { i, y: g.position.y };
+      geos.forEach(geo => { const m = new THREE.Mesh(geo, mat[0]); m.userData.pav = i; g.add(m); });
       predio.add(g); andares.push(g);
     });
     const meio = alturaTotal(n) / 2; ctl.target.set(0, meio, 0);
@@ -70,7 +66,7 @@ export function criarCena(aoClicar) {
   function enquadrar() {
     if (!larg || !andares.length) return;
     cam.aspect = larg / alt; cam.updateProjectionMatrix();
-    const h = alturaTotal(andares.length) + 1.2, t = Math.tan(cam.fov * Math.PI / 360), d = Math.max(h / 2 / t, 6.7 / (t * cam.aspect)) * 1.13;
+    const h = alturaTotal(andares.length) + 1.2, t = Math.tan(cam.fov * Math.PI / 360), d = Math.max(h / 2 / t, (raioTorre() + 1.5) / (t * cam.aspect)) * 1.13;
     cam.position.sub(ctl.target).setLength(d).add(ctl.target);
     ctl.minDistance = d * .45; ctl.maxDistance = d * 1.6; ctl.update();
   }
@@ -117,9 +113,13 @@ export function criarCena(aoClicar) {
     el,
     /** pavs: de baixo para cima, [{ n, estados: [2 concluída | 1 em montagem | 0 a fazer, ...], etiqueta: html }] */
     definir(pavs) {
-      dados = pavs; const a = pavs.map(p => p.estados.length).join(',');
+      dados = pavs; const a = String(pavs.length);
       if (a !== assinatura) { assinatura = a; montar(pavs); }
-      pavs.forEach((p, i) => { const ord = [...p.estados].sort((x, y) => y - x); andares[i].children.forEach((m, k) => { m.material = mat[ord[k]]; }); });
+      pavs.forEach((p, i) => {
+        // estados: apartamentos na ordem do número e o hall por último. Vaga da planta sem apartamento no contrato fica apagada.
+        const q = p.estados.length - 1, ms = andares[i].children;
+        ms.forEach((m, k) => { m.material = k === APTOS_POR_PAV ? mat[p.estados[q]] : k < q ? mat[p.estados[k]] : mat.fora; });
+      });
     },
   };
 }
