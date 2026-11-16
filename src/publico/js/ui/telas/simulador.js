@@ -1,6 +1,7 @@
 import { app } from '../../nucleo/contexto.js';
 import { preverComN, equipesPara } from '/compartilhado/previsao.js';
-import { dn, fData, fCurta, num, plural } from '/compartilhado/datas.js';
+import { dn, fData, fCurta, num, plural, brl } from '/compartilhado/datas.js';
+import { cenariosTerceirizar } from '/compartilhado/terceirizar.js';
 import { diasApto } from '../formato.js';
 
 /** Aba Simulador: quantas equipes para terminar numa data, e o término para cada quantidade de equipes. */
@@ -25,5 +26,30 @@ export function simulador() {
     <div class="card"><div class="rot"><span>Término conforme a quantidade de equipes</span><span class="mudo" style="letter-spacing:0;text-transform:none;font-weight:500">barra = tempo que falta</span></div>
       <div class="grade" style="gap:4px">${linhas.map(l => { const ok = dn(l.s.d) <= dn(sim.alvo), d = dn(l.s.d) - dn(sim.alvo);
         return `<div class="sl ${l.N === precisa ? 'meta' : l.N === n ? 'atual' : ''}"><span>${plural(l.N, 'equipe', 'equipes')}</span><div class="barra ${ok ? 'ok' : 'al'}"><i style="width:${l.dias / pior * 100}%"></i></div><span class="dir">${fData(l.s.d)}</span>
-          <span class="dir">${l.N === precisa ? '<span class="selo ok">mínimo p/ a data</span>' : l.N === n ? '<span class="selo mc">hoje</span>' : `<span class="mudo">${d > 0 ? '+' : ''}${plural(d, 'dia', 'dias')}</span>`}</span></div>`; }).join('')}</div></div></div>`;
+          <span class="dir">${l.N === precisa ? '<span class="selo ok">mínimo p/ a data</span>' : l.N === n ? '<span class="selo mc">hoje</span>' : `<span class="mudo">${d > 0 ? '+' : ''}${plural(d, 'dia', 'dias')}</span>`}</span></div>`; }).join('')}</div></div>
+    ${terceirizar()}</div>`;
+}
+
+const pc = v => num(v, 1) + '%';
+
+/** Cartão "Vale a pena trazer terceirizadas?": compara o custo da obra com e sem equipes a mais. */
+function terceirizar() {
+  const { S, R, sim } = app, pct = S.pag.pctTerc, C = cenariosTerceirizar(S, R, { salario: S.pag.salarioFixa, entrada: sim.entrada, pct });
+  if (!C.length) return '';
+  const [base, ...mais] = C, uteis = mais.filter(x => x.pctMax != null), teto = uteis.length ? Math.min(...uteis.map(x => x.pctMax)) : null, apto = uteis.length ? Math.min(...uteis.map(x => x.porApto)) : null;
+  const melhor = pct != null && uteis.length ? uteis.reduce((a, b) => b.saldo > a.saldo ? b : a) : null;
+  const resumo = !base.fixas ? '<b>Não há equipe fixa ativa na obra.</b> Sem salário de equipe fixa para economizar, a conta não se aplica.'
+    : teto == null || teto <= 0 ? '<b>Com os números de hoje não compensa:</b> a economia de salário não cobre o que a terceirizada montaria.'
+      : `Vale a pena pagar à terceirizada <b>até ${pc(teto)} do valor da unidade</b>, perto de <b>${brl(apto)} por apartamento</b>. Abaixo disso a obra sai mais barata com terceirizadas; acima, sai mais cara. ${melhor ? (melhor.saldo > 0 ? `Pagando ${pc(pct)}, o melhor cenário é <b>+${melhor.k}</b>: sobram <b>${brl(melhor.saldo)}</b> e a obra termina em ${fData(melhor.fim)}.` : `Pagando ${pc(pct)} você <b>perde dinheiro</b> em qualquer cenário; o ganho é só de prazo.`) : ''}`;
+  return `<div class="card terc"><div class="rot"><span>Vale a pena trazer terceirizadas?</span><span class="mudo" style="letter-spacing:0;text-transform:none;font-weight:500">supondo que montem no ritmo de uma equipe fixa · entram em ${fCurta(sim.entrada)}</span></div>
+    <div class="terc-topo"><div class="veredito ${teto > 0 ? 'ok' : 'nt'}"><div class="ic">${teto > 0 ? '$' : 'i'}</div><div>${resumo}</div></div>
+      <label class="campo">Salário mensal de uma equipe fixa (R$)<input type="number" min="0" step="50" inputmode="decimal" data-pg="salario" value="${S.pag.salarioFixa}"></label>
+      <label class="campo">% que penso em pagar à terceirizada<input type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="opcional" data-pg="pct-terc" value="${pct ?? ''}"></label></div>
+    <div class="rolagem"><table class="tab terc-tab"><thead><tr><th>Terceirizadas a mais</th><th class="dir">Término</th><th class="dir">Salário das ${base.fixas} fixas</th><th class="dir">% das equipes de hoje</th><th class="dir">Economia</th><th class="dir">Pode pagar até</th>${pct != null ? `<th class="dir">Custo a ${pc(pct)}</th><th class="dir">Saldo</th>` : ''}</tr></thead>
+      <tbody>${C.map(x => `<tr class="${x === melhor && x.saldo > 0 ? 'melhor' : ''}"><td><b>${x.k ? '+' + x.k : 'Nenhuma (hoje)'}</b>${x.k ? `<small class="mudo">montam ${plural(x.nTerc, 'unidade', 'unidades')}</small>` : ''}</td>
+        <td class="dir">${fData(x.fim)}${x.k ? `<small class="mudo">${plural(dn(x.fim) - dn(base.fim), 'dia', 'dias')}</small>` : ''}</td><td class="dir">${brl(x.salarios)}<small class="mudo">${num(x.meses, 1)} meses de obra</small></td><td class="dir">${brl(x.comissao)}</td>
+        <td class="dir">${x.k ? '<b>' + brl(x.economia) + '</b>' : '—'}</td><td class="dir">${x.pctMax == null ? '—' : `<b>${pc(x.pctMax)}</b><small class="mudo">${brl(x.porApto)} por apto</small>`}</td>
+        ${pct != null ? `<td class="dir">${x.k ? brl(x.custoTerc) : '—'}</td><td class="dir">${x.k ? `<span class="selo ${x.saldo > 0 ? 'ok' : 'al'}">${x.saldo > 0 ? 'sobra ' : 'falta '}${brl(Math.abs(x.saldo))}</span>` : '—'}</td>` : ''}</tr>`).join('')}</tbody></table></div>
+    <p class="mudo" style="margin-top:12px;font-size:12px"><b>Como eu calculo:</b> cada cenário usa a previsão do cronograma. "Salário das fixas" é o salário das equipes fixas pelos meses que ainda faltam de obra. "Economia" é o que você deixa de gastar com as equipes de hoje (menos meses de salário e menos percentual, porque a terceirizada monta parte das unidades). "Pode pagar até" é essa economia dividida pelo valor do que a terceirizada monta: é o ponto de empate.${base.aCombinar ? ' Equipes de hoje com pagamento "a combinar" entram com custo zero.' : ''}
+      <br><b>O que a conta não enxerga:</b> o salário só é economia de verdade se a equipe fixa liberada antes for produzir em outro serviço da loja; se ela ficar parada, você paga o salário do mesmo jeito. Também ficam de fora o ganho de entregar antes (receber antes, evitar multa) e o risco de qualidade e retrabalho da terceirizada.</p></div>`;
 }

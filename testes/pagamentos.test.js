@@ -77,7 +77,7 @@ test('obra antiga (sem pagamentos) é completada sem perder nada', () => {
   S.feitos['1-1'] = { d: '2026-11-20', t: 0, e: 'e1' };
   assert.ok(calcular(S, HOJE).fim); // a previsão funciona mesmo antes de completar
   garantirPagamentos(S);
-  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 5); assert.deepEqual(S.pag.itens.map(i => i.dias), [2, 2, 2, 2, 1, 5]); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
+  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 18); assert.deepEqual(S.pag.itens.map(i => i.dias), [2, 2, 2, 2, 1, 18]); assert.equal(S.pag.salarioFixa, 2500); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
 });
 
 test('registro de atividades descreve mudanças de pagamento e a recepção', () => {
@@ -94,12 +94,30 @@ test('meta de dias por modelo, hall e recepção muda a previsão; sem modelo va
   const dia = { d: '2026-11-14', t: 1 }, fim = S => calcular(S, dia).fim.d, base = fim(estadoPadrao(dia.d));
   const peso = (S, id) => calcular(S, dia).c.porId.get(id).peso, item = (S, id) => S.pag.itens.find(i => i.id === id);
   const S = estadoPadrao(dia.d);
-  assert.equal(peso(S, '1-1'), 1); assert.equal(peso(S, '1-H'), .5); assert.equal(peso(S, 'R'), 2.5);
-  S.pag.modelos['1-1'] = 'm4'; item(S, 'm4').dias = 3; item(S, 'hall').dias = 2; item(S, 'recep').dias = 10;
-  assert.equal(peso(S, '1-1'), 1.5); assert.equal(peso(S, '1-2'), 1); assert.equal(peso(S, '1-H'), 1); assert.equal(peso(S, 'R'), 5);
+  assert.equal(peso(S, '1-1'), 1); assert.equal(peso(S, '1-H'), .5); assert.equal(peso(S, 'R'), 9);
+  S.pag.modelos['1-1'] = 'm4'; item(S, 'm4').dias = 3; item(S, 'hall').dias = 2; item(S, 'recep').dias = 20;
+  assert.equal(peso(S, '1-1'), 1.5); assert.equal(peso(S, '1-2'), 1); assert.equal(peso(S, '1-H'), 1); assert.equal(peso(S, 'R'), 10);
   assert.ok(fim(S) > base, 'metas maiores empurram o término');
   const R = estadoPadrao(dia.d); item(R, 'recep').dias = 1; item(R, 'hall').dias = .5;
   assert.ok(fim(R) < base, 'metas menores adiantam o término');
   const a = estadoPadrao(dia.d), d = structuredClone(a); item(d, 'm3').dias = 2.5;
   assert.deepEqual(diferencas(a, d).map(i => i.texto), ['Alterou a meta de montagem de Apartamento 03 - 3 Camas: de 2 para 2,5 dias']);
+});
+
+test('vale a pena terceirizar: o teto fica perto de salário + percentual da equipe fixa', async () => {
+  const { cenariosTerceirizar, valorMedioApto } = await import('../src/compartilhado/terceirizar.js');
+  const S = estadoPadrao('2026-11-14'), dia = { d: '2026-11-14', t: 1 }, R = calcular(S, dia);
+  assert.equal(Math.round(valorMedioApto(S) * 100) / 100, 8856.45);
+  const C = cenariosTerceirizar(S, R, { salario: 2500, entrada: S.cfg.inicio, pct: 4, max: 3 });
+  assert.equal(C.length, 4); assert.equal(C[0].k, 0); assert.equal(C[0].vTerc, 0); assert.equal(C[0].fixas, 4);
+  assert.ok(Math.abs(C[0].comissao - 66091.86) < 1); // 3% do contrato inteiro (sem modelo usa o valor médio)
+  for (const x of C.slice(1)) {
+    assert.ok(x.fim < C[0].fim, 'mais equipes terminam antes'); assert.ok(x.salarios < C[0].salarios);
+    assert.ok(x.pctMax > 5 && x.pctMax < 6, 'teto: 3% + o salário diluído no que a equipe monta'); // ~5,5%
+    assert.ok(x.saldo > 0, 'pagando 4% sobra dinheiro'); assert.equal(Math.round((x.economia - x.custoTerc - x.saldo) * 100), 0);
+  }
+  const caro = cenariosTerceirizar(S, R, { salario: 2500, entrada: S.cfg.inicio, pct: 8, max: 2 });
+  assert.ok(caro.slice(1).every(x => x.saldo < 0), 'pagando 8% a obra fica mais cara');
+  const semSalario = cenariosTerceirizar(S, R, { salario: 0, entrada: S.cfg.inicio, max: 2 });
+  assert.ok(semSalario.slice(1).every(x => Math.abs(x.pctMax - 3) < .01), 'sem salário, o teto é o mesmo percentual da fixa');
 });

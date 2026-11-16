@@ -21,7 +21,7 @@ export function contexto(S, ag) {
     unidades.push({ id: p.n + '-H', pav: p.n, tipo: 'hall', nome: 'Hall ' + p.n + 'º', peso: meta('hall', S.cfg.hallDias) });
   }
   // a recepção (térreo) é uma unidade só, sem pavimento: fica no fim da fila, mas pode ser concluída ou reservada a qualquer hora
-  unidades.push({ id: 'R', pav: 0, tipo: 'recep', nome: 'Recepção', peso: meta('recep', S.cfg.recepDias ?? 5) });
+  unidades.push({ id: 'R', pav: 0, tipo: 'recep', nome: 'Recepção', peso: meta('recep', S.cfg.recepDias ?? 18) });
   const porId = new Map(unidades.map(u => [u.id, u]));
   const now = cal.ini(ag.d, ag.t), T0 = cal.ini(S.cfg.inicio, 0);
   const feito = new Map();

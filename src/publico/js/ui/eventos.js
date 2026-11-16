@@ -90,7 +90,9 @@ function aoMudar(ev) {
   } else if (t.dataset.pg) {
     const k = t.dataset.pg, v = t.value === '' ? null : Math.max(0, +t.value || 0);
     if (k === 'ext-eq' || k === 'ext-mes') { app.extrato[k === 'ext-eq' ? 'e' : 'mes'] = t.value; return desenhar(false); }
-    if (k === 'dias') { if (!(v > 0)) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).dias = Math.min(90, Math.max(.5, Math.round(v * 2) / 2)); }
+    if (k === 'salario') { if (v == null) return desenhar(false); S.pag.salarioFixa = Math.round(v * 100) / 100; }
+    else if (k === 'pct-terc') S.pag.pctTerc = v == null ? null : Math.min(100, v);
+    else if (k === 'dias') { if (!(v > 0)) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).dias = Math.min(90, Math.max(.5, Math.round(v * 2) / 2)); }
     else if (k === 'valor') { if (v == null) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).valor = Math.round(v * 100) / 100; }
     else if (k === 'pct') eq(t.dataset.e).pag.pct = v == null ? null : Math.min(100, v);
     else eq(t.dataset.e).pag.fixo[k] = v == null ? null : Math.round(v * 100) / 100;

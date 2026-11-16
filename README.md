@@ -10,7 +10,7 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 - **Acompanhamento**: situação em uma frase, % concluído, prédio em 3D que acende conforme os pavimentos avançam (gira sozinho; arraste para girar, role para aproximar, clique num pavimento para ir até ele), previsão de término, ritmo, mapa do edifício (clique na unidade para marcar como concluída, com equipe, data e manhã/tarde), gráfico de avanço e ranking das equipes.
 - **Cronograma**: linha do tempo por equipe, dia dividido em manhã e tarde.
 - **Equipes**: cadastrar, editar, retirar e reativar. O cronograma se refaz na hora.
-- **Simulador**: quantas equipes são necessárias para terminar numa data.
+- **Simulador**: quantas equipes são necessárias para terminar numa data, e se vale a pena trazer terceirizadas (até quanto dá para pagar a elas sem a obra ficar mais cara).
 - **Pagamentos**: quanto cada equipe recebe em cada mês, como cada uma é paga (percentual do valor da unidade ou valor fixo), valores do contrato e extrato por equipe em PDF.
 - **Cliente**: previsão de liberação de cada pavimento, link só de leitura para o cliente, impressão e texto para WhatsApp.
 - **Atividades**: registro de quem fez o quê, com data e hora de Fortaleza.
@@ -31,7 +31,8 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 
 ## Valores provisórios (conferir em Configurações)
 - Distribuição dos apartamentos: 11 pavimentos com 14 e 6 com 13.
-- Meta de montagem por item (Configurações): 2 dias para cada modelo de apartamento, 1 para o hall e 5 para a recepção, que fica no fim da fila.
+- Meta de montagem por item (Configurações): 2 dias para cada modelo de apartamento, 1 para o hall e 18 para a recepção (estimativa do Mateus), que fica no fim da fila.
+- Salário mensal de uma equipe fixa: R$ 2.500 (informado pelo Mateus), usado só na conta de terceirização do Simulador.
 - Data de início: a próxima segunda-feira.
 
 ## Rodar no computador (para testar)

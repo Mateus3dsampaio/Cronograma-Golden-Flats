@@ -42,6 +42,7 @@ export function diferencas(antes, depois) {
   if (antes.pag && depois.pag) {
     for (const d of depois.pag.itens) { const a = antes.pag.itens.find(i => i.id === d.id); if (a && a.valor !== d.valor) add('pagamento', `Alterou o valor de ${d.nome}: de ${brl(a.valor)} para ${brl(d.valor)}`);
       if (a && a.dias != null && a.dias !== d.dias) add('config', `Alterou a meta de montagem de ${d.nome}: de ${String(a.dias).replace('.', ',')} para ${String(d.dias).replace('.', ',')} dias`); }
+    if (antes.pag.salarioFixa != null && antes.pag.salarioFixa !== depois.pag.salarioFixa) add('pagamento', `Alterou o salário mensal da equipe fixa: de ${brl(antes.pag.salarioFixa)} para ${brl(depois.pag.salarioFixa)}`);
     const ids = new Set([...Object.keys(antes.pag.modelos), ...Object.keys(depois.pag.modelos)]), n = [...ids].filter(id => antes.pag.modelos[id] !== depois.pag.modelos[id]);
     if (n.length === 1) add('pagamento', `Alterou o modelo do ${nomeUnidade(n[0])}`); else if (n.length) add('pagamento', `Alterou o modelo de ${n.length} apartamentos`);
   }

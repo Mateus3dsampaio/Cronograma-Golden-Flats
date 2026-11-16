@@ -17,21 +17,26 @@ const ITENS_CONTRATO = [
   { id: 'm3', tipo: 'apto', nome: 'Apartamento 03 - 3 Camas', curto: '3 Camas', valor: 8299.06, qtd: 30, dias: 2 },
   { id: 'm4', tipo: 'apto', nome: 'Apartamento Completo', curto: 'Completo', valor: 11417.81, qtd: 64, dias: 2 },
   { id: 'hall', tipo: 'hall', nome: 'Hall Pavimentos', curto: 'Hall', valor: 5457.17, qtd: 17, dias: 1 },
-  { id: 'recep', tipo: 'recep', nome: 'Recepção', curto: 'Recepção', valor: 55594.33, qtd: 1, dias: 5 },
+  { id: 'recep', tipo: 'recep', nome: 'Recepção', curto: 'Recepção', valor: 55594.33, qtd: 1, dias: 18 } // 18 dias: estimativa do Mateus em 16/11/2026,
 ];
 
 /** Parte de pagamentos de uma obra nova. `modelos` = id do apartamento -> id do modelo (m1..m4). */
-export const pagPadrao = () => ({ itens: ITENS_CONTRATO.map(i => ({ ...i })), modelos: {} });
+/** Salário mensal de uma equipe fixa (informado pelo Mateus em 16/11/2026). Usado na conta "vale a pena terceirizar?". */
+export const SALARIO_FIXA = 2500;
+
+export const pagPadrao = () => ({ itens: ITENS_CONTRATO.map(i => ({ ...i })), modelos: {}, salarioFixa: SALARIO_FIXA, pctTerc: null });
 
 /** Como uma equipe é paga: percentual do valor da unidade ou valor fixo em reais por unidade. `null` = ainda a combinar. */
 export const pagEquipePadrao = tipo => ({ modo: 'pct', pct: tipo === 'fixa' ? PCT_FIXA : null, fixo: { apto: null, hall: null, recep: null } });
 
 /** Completa obras gravadas antes de existirem os pagamentos e a recepção (não apaga nada do que já existe). */
 export function garantirPagamentos(S) {
-  if (S.cfg.recepDias == null) S.cfg.recepDias = 5;
+  if (S.cfg.recepDias == null) S.cfg.recepDias = 18;
   if (!S.pag || !Array.isArray(S.pag.itens)) S.pag = pagPadrao();
   for (const p of ITENS_CONTRATO) if (!S.pag.itens.some(i => i.id === p.id)) S.pag.itens.push({ ...p });
   if (!S.pag.modelos) S.pag.modelos = {};
+  if (S.pag.salarioFixa == null) S.pag.salarioFixa = SALARIO_FIXA;
+  if (S.pag.pctTerc === undefined) S.pag.pctTerc = null; // % que o Mateus pensa em pagar à terceirizada (simulação)
   // meta de dias por item: obra gravada antes dela herda os prazos gerais que já estavam em uso
   for (const i of S.pag.itens) if (!(i.dias > 0)) i.dias = i.tipo === 'apto' ? S.cfg.aptoDias : i.tipo === 'hall' ? S.cfg.hallDias : S.cfg.recepDias;
   for (const e of S.equipes) {

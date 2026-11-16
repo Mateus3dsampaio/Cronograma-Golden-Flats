@@ -13,7 +13,7 @@ export function estadoPadrao(hoje) {
       nome: 'Golden Flats', inicio: dnIso(ini), prazo: '',
       aptoDias: 2,
       hallDias: 1,            // PROVISÓRIO: o Mateus ainda não definiu quanto leva um hall
-      recepDias: 5,           // PROVISÓRIO: o Mateus ainda não definiu quanto leva a recepção
+      recepDias: 18,          // só para obra antiga, sem meta por item: a meta da recepção fica em pag.itens
       ordem: 'asc',           // asc = de baixo para cima
       semana: [0, 2, 2, 2, 2, 2, 0], // dom..sáb: 0 não trabalha, 1 só manhã, 2 dia inteiro
       feriados: [], margemCliente: 0, base: 'real',

@@ -197,3 +197,13 @@ button.selo{cursor:pointer}button.selo:hover{filter:brightness(1.2)}
 .pg-tab th:first-child,.pg-tab td:first-child{position:sticky;left:0;z-index:1;background:var(--coluna)}
 /* Configurações: meta de dias por item */
 .metas{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+/* Simulador: vale a pena trazer terceirizadas? */
+.sim>.terc{grid-column:1/-1}
+.terc-topo{display:grid;grid-template-columns:1fr 230px 230px;gap:14px;align-items:end;margin-bottom:14px}
+.terc-topo .veredito{font-size:14px;align-self:stretch}
+.terc-tab td{white-space:nowrap}
+.terc-tab th,.terc-tab td{padding-left:10px;padding-right:10px}
+.terc-tab th{letter-spacing:.1em}
+.terc-tab td small{display:block;font-size:11px;font-weight:500;margin-top:2px}
+.terc-tab tr.melhor td{background:color-mix(in srgb,var(--ok) 9%,transparent)}
+.terc-tab tr.melhor td:first-child{box-shadow:inset 3px 0 0 var(--ok)}

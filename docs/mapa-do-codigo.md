@@ -17,6 +17,7 @@ Três partes, cada uma numa pasta de `src/`:
 | Meta de dias de cada modelo, do hall e da recepção (valores iniciais) | `src/compartilhado/pagamentos.js` (a tela fica em Configurações) |
 | O que o cliente vê e o texto do WhatsApp | `src/compartilhado/cliente.js` |
 | Regra do pagamento das equipes, percentual padrão (3%), valores do contrato | `src/compartilhado/pagamentos.js` |
+| A conta "vale a pena trazer terceirizadas?" (premissas, salário da equipe fixa) | `src/compartilhado/terceirizar.js` (a tela fica no Simulador) |
 | A aba Pagamentos e o extrato em PDF | `src/publico/js/ui/telas/pagamentos.js` |
 | O mapa de modelos dos apartamentos | `src/publico/js/ui/telas/configuracoes.js` |
 | A logomarca Italínea | `src/publico/img/italinea.svg` (tamanho e posição em `css/moldura.css`) |
@@ -39,6 +40,7 @@ Três partes, cada uma numa pasta de `src/`:
 | `calendario.js` | Transforma dias trabalhados em turnos (manhã/tarde) |
 | `previsao.js` | Motor: ritmo de cada equipe, distribuição das unidades (apartamentos, halls e a recepção, que fica no fim da fila), previsão, simulador, indicadores |
 | `pagamentos.js` | Itens do contrato (valor e meta de dias de cada um) e pagamento das equipes: valores do contrato, modelo de cada apartamento, quanto cada equipe recebe por unidade (percentual ou valor fixo), soma por mês pela data da conclusão, previsão dos meses seguintes e extrato |
+| `terceirizar.js` | Vale a pena trazer terceirizadas: para cada quantidade de equipes a mais, término, salário das fixas, economia e o máximo que dá para pagar à terceirizada |
 | `cliente.js` | Previsão por pavimento para o cliente, com margem de segurança |
 | `exemplo.js` | Obra fictícia do "modo exemplo" |
 
@@ -82,4 +84,4 @@ Três partes, cada uma numa pasta de `src/`:
 | `js/ui/formato.js` | Formatos de tela: selo de atraso, dias por apto, data e hora em Fortaleza, "Marcado por…" |
 
 ## Testes (`testes/`)
-`npm test` roda `previsao.test.js` (contas), `pagamentos.test.js` (regra do mês, percentual, valor fixo, pendências, obra antiga), `atividades.test.js` (textos do registro e carimbo) e `servidor.test.js` (login, usuários, gravação, registro, link do cliente).
+`npm test` roda `previsao.test.js` (contas), `pagamentos.test.js` (regra do mês, percentual, valor fixo, pendências, obra antiga, metas por item, terceirização), `atividades.test.js` (textos do registro e carimbo) e `servidor.test.js` (login, usuários, gravação, registro, link do cliente).
