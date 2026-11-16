@@ -15,11 +15,12 @@ export function configuracoes() {
         <label class="campo tudo">Nome da obra<input data-cfg="nome" value="${esc(c.nome)}" maxlength="40"></label>
         <label class="campo">Início da montagem<input type="date" data-cfg="inicio" value="${c.inicio}"></label>
         <label class="campo">Prazo combinado com o cliente<input type="date" data-cfg="prazo" value="${c.prazo}"></label>
-        <label class="campo">Dias por apartamento (1 equipe)<input type="number" step="0.5" min="0.5" max="30" data-cfg="aptoDias" value="${c.aptoDias}"></label>
-        <label class="campo">Dias por hall (provisório)<input type="number" step="0.5" min="0.5" max="30" data-cfg="hallDias" value="${c.hallDias}"></label>
-        <label class="campo tudo">Dias da recepção (provisório · 1 unidade, no fim da fila)<input type="number" step="0.5" min="0.5" max="60" data-cfg="recepDias" value="${c.recepDias}"></label>
         <div class="campo tudo">Ordem de montagem<div class="seg"><button class="${c.ordem === 'asc' ? 'on' : ''}" data-a="ordem" data-v="asc">De baixo para cima</button><button class="${c.ordem === 'desc' ? 'on' : ''}" data-a="ordem" data-v="desc">De cima para baixo</button></div></div>
         <div class="campo tudo">Base da previsão<div class="seg"><button class="${c.base === 'real' ? 'on' : ''}" data-a="base" data-v="real">Ritmo real das equipes</button><button class="${c.base === 'plano' ? 'on' : ''}" data-a="base" data-v="plano">Sempre o planejado</button></div></div></div></div>
+      <div class="card"><div class="rot">Meta de montagem · dias de uma equipe por unidade</div>
+        <div class="metas">${S.pag.itens.map(i => `<label class="campo">${esc(i.nome)}<input type="number" step="0.5" min="0.5" max="90" data-pg="dias" data-id="${i.id}" value="${i.dias}"></label>`).join('')}
+          <label class="campo">Apartamento sem modelo marcado<input type="number" step="0.5" min="0.5" max="30" data-cfg="aptoDias" value="${c.aptoDias}"></label></div>
+        <p class="mudo" style="margin-top:12px;font-size:12px">A meta é o ponto de partida da previsão. Conforme as conclusões são marcadas, a previsão passa a seguir o ritmo real de cada equipe: quem monta mais rápido que a meta adianta o término, quem demora mais atrasa. Aceita meio dia (ex.: 1,5). A recepção é uma unidade só e fica no fim da fila.</p></div>
       <div class="card"><div class="rot">Dias de trabalho · clique para alternar</div>
         <div class="dias">${c.semana.map((m, i) => `<button class="m${m}" data-a="dia" data-i="${i}">${DS[i].toUpperCase()}<small>${ROT[m]}</small></button>`).join('')}</div>
         <div class="rot" style="margin:18px 0 10px">Feriados e dias parados</div>

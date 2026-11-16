@@ -7,14 +7,17 @@
 /** Percentual padrão da equipe fixa sobre o valor da unidade. Terceirizada entra "a combinar". */
 export const PCT_FIXA = 3;
 
-/** Valores do orçamento Italínea enviado pelo Mateus em 16/11/2026. `qtd` = quantidade em contrato. Editáveis na aba Pagamentos. */
+/**
+ * Valores do orçamento Italínea enviado pelo Mateus em 16/11/2026. `qtd` = quantidade em contrato. Editáveis na aba Pagamentos.
+ * `dias` = meta de montagem de uma unidade por uma equipe (PROVISÓRIO: o Mateus define em Configurações). A previsão parte dessa meta.
+ */
 const ITENS_CONTRATO = [
-  { id: 'm1', tipo: 'apto', nome: 'Apartamento 01 - Casal', curto: 'Casal', valor: 7789.74, qtd: 69 },
-  { id: 'm2', tipo: 'apto', nome: 'Apartamento 02 - 2 Camas', curto: '2 Camas', valor: 7789.74, qtd: 69 },
-  { id: 'm3', tipo: 'apto', nome: 'Apartamento 03 - 3 Camas', curto: '3 Camas', valor: 8299.06, qtd: 30 },
-  { id: 'm4', tipo: 'apto', nome: 'Apartamento Completo', curto: 'Completo', valor: 11417.81, qtd: 64 },
-  { id: 'hall', tipo: 'hall', nome: 'Hall Pavimentos', curto: 'Hall', valor: 5457.17, qtd: 17 },
-  { id: 'recep', tipo: 'recep', nome: 'Recepção', curto: 'Recepção', valor: 55594.33, qtd: 1 },
+  { id: 'm1', tipo: 'apto', nome: 'Apartamento 01 - Casal', curto: 'Casal', valor: 7789.74, qtd: 69, dias: 2 },
+  { id: 'm2', tipo: 'apto', nome: 'Apartamento 02 - 2 Camas', curto: '2 Camas', valor: 7789.74, qtd: 69, dias: 2 },
+  { id: 'm3', tipo: 'apto', nome: 'Apartamento 03 - 3 Camas', curto: '3 Camas', valor: 8299.06, qtd: 30, dias: 2 },
+  { id: 'm4', tipo: 'apto', nome: 'Apartamento Completo', curto: 'Completo', valor: 11417.81, qtd: 64, dias: 2 },
+  { id: 'hall', tipo: 'hall', nome: 'Hall Pavimentos', curto: 'Hall', valor: 5457.17, qtd: 17, dias: 1 },
+  { id: 'recep', tipo: 'recep', nome: 'Recepção', curto: 'Recepção', valor: 55594.33, qtd: 1, dias: 5 },
 ];
 
 /** Parte de pagamentos de uma obra nova. `modelos` = id do apartamento -> id do modelo (m1..m4). */
@@ -29,6 +32,8 @@ export function garantirPagamentos(S) {
   if (!S.pag || !Array.isArray(S.pag.itens)) S.pag = pagPadrao();
   for (const p of ITENS_CONTRATO) if (!S.pag.itens.some(i => i.id === p.id)) S.pag.itens.push({ ...p });
   if (!S.pag.modelos) S.pag.modelos = {};
+  // meta de dias por item: obra gravada antes dela herda os prazos gerais que já estavam em uso
+  for (const i of S.pag.itens) if (!(i.dias > 0)) i.dias = i.tipo === 'apto' ? S.cfg.aptoDias : i.tipo === 'hall' ? S.cfg.hallDias : S.cfg.recepDias;
   for (const e of S.equipes) {
     if (!e.pag) e.pag = pagEquipePadrao(e.tipo);
     if (!e.pag.fixo) e.pag.fixo = { apto: null, hall: null, recep: null };

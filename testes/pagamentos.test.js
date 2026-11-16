@@ -77,7 +77,7 @@ test('obra antiga (sem pagamentos) é completada sem perder nada', () => {
   S.feitos['1-1'] = { d: '2026-11-20', t: 0, e: 'e1' };
   assert.ok(calcular(S, HOJE).fim); // a previsão funciona mesmo antes de completar
   garantirPagamentos(S);
-  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 5); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
+  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 5); assert.deepEqual(S.pag.itens.map(i => i.dias), [2, 2, 2, 2, 1, 5]); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
 });
 
 test('registro de atividades descreve mudanças de pagamento e a recepção', () => {
@@ -88,4 +88,18 @@ test('registro de atividades descreve mudanças de pagamento e a recepção', ()
   assert.ok(t.includes('Alterou o pagamento da equipe Terceirizada: 4% do valor da unidade (antes: A combinar)'));
   assert.ok(t.includes('Alterou o valor de Apartamento 01 - Casal: de R$ 7.789,74 para R$ 8.000,00'));
   assert.ok(t.includes('Alterou o modelo do Apto 201'));
+});
+
+test('meta de dias por modelo, hall e recepção muda a previsão; sem modelo vale o prazo geral', () => {
+  const dia = { d: '2026-11-14', t: 1 }, fim = S => calcular(S, dia).fim.d, base = fim(estadoPadrao(dia.d));
+  const peso = (S, id) => calcular(S, dia).c.porId.get(id).peso, item = (S, id) => S.pag.itens.find(i => i.id === id);
+  const S = estadoPadrao(dia.d);
+  assert.equal(peso(S, '1-1'), 1); assert.equal(peso(S, '1-H'), .5); assert.equal(peso(S, 'R'), 2.5);
+  S.pag.modelos['1-1'] = 'm4'; item(S, 'm4').dias = 3; item(S, 'hall').dias = 2; item(S, 'recep').dias = 10;
+  assert.equal(peso(S, '1-1'), 1.5); assert.equal(peso(S, '1-2'), 1); assert.equal(peso(S, '1-H'), 1); assert.equal(peso(S, 'R'), 5);
+  assert.ok(fim(S) > base, 'metas maiores empurram o término');
+  const R = estadoPadrao(dia.d); item(R, 'recep').dias = 1; item(R, 'hall').dias = .5;
+  assert.ok(fim(R) < base, 'metas menores adiantam o término');
+  const a = estadoPadrao(dia.d), d = structuredClone(a); item(d, 'm3').dias = 2.5;
+  assert.deepEqual(diferencas(a, d).map(i => i.texto), ['Alterou a meta de montagem de Apartamento 03 - 3 Camas: de 2 para 2,5 dias']);
 });

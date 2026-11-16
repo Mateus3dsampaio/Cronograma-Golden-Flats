@@ -9,15 +9,19 @@ const PESO_PLANO = 2; // nas primeiras unidades a previsão ainda pesa o planeja
 
 /** Junta tudo o que a previsão precisa: unidades, o que foi feito e o ritmo de cada equipe. */
 export function contexto(S, ag) {
-  const cal = criarCalendario(S), A = S.cfg.aptoDias * 2, H = S.cfg.hallDias * 2, RC = (S.cfg.recepDias ?? 5) * 2;
+  const cal = criarCalendario(S), A = S.cfg.aptoDias * 2, H = S.cfg.hallDias * 2;
+  // meta de dias de cada unidade: a do item (modelo do apartamento, hall ou recepção); sem modelo marcado vale o prazo geral do apartamento.
+  // O peso compara a unidade com o apartamento de referência (cfg.aptoDias): é com ele que o ritmo das equipes é medido.
+  const itens = (S.pag && S.pag.itens) || [], mods = (S.pag && S.pag.modelos) || {};
+  const meta = (idItem, padrao) => { const i = itens.find(x => x.id === idItem); return (i && i.dias > 0 ? i.dias : padrao) * 2 / A; };
   const pavs = [...S.pavs].sort((a, b) => S.cfg.ordem === 'asc' ? a.n - b.n : b.n - a.n);
   const unidades = [];
   for (const p of pavs) {
-    for (let k = 1; k <= p.q; k++) unidades.push({ id: p.n + '-' + k, pav: p.n, tipo: 'apto', nome: p.n + String(k).padStart(2, '0'), peso: 1 });
-    unidades.push({ id: p.n + '-H', pav: p.n, tipo: 'hall', nome: 'Hall ' + p.n + 'º', peso: H / A });
+    for (let k = 1; k <= p.q; k++) unidades.push({ id: p.n + '-' + k, pav: p.n, tipo: 'apto', nome: p.n + String(k).padStart(2, '0'), peso: meta(mods[p.n + '-' + k], S.cfg.aptoDias) });
+    unidades.push({ id: p.n + '-H', pav: p.n, tipo: 'hall', nome: 'Hall ' + p.n + 'º', peso: meta('hall', S.cfg.hallDias) });
   }
   // a recepção (térreo) é uma unidade só, sem pavimento: fica no fim da fila, mas pode ser concluída ou reservada a qualquer hora
-  unidades.push({ id: 'R', pav: 0, tipo: 'recep', nome: 'Recepção', peso: RC / A });
+  unidades.push({ id: 'R', pav: 0, tipo: 'recep', nome: 'Recepção', peso: meta('recep', S.cfg.recepDias ?? 5) });
   const porId = new Map(unidades.map(u => [u.id, u]));
   const now = cal.ini(ag.d, ag.t), T0 = cal.ini(S.cfg.inicio, 0);
   const feito = new Map();

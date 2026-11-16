@@ -195,3 +195,5 @@ button.selo{cursor:pointer}button.selo:hover{filter:brightness(1.2)}
 .cel.mod:not(.m0){color:#fff;border-color:var(--c);background:color-mix(in srgb,var(--c) 30%,#111922)}
 .pg-tab td:first-child small{white-space:normal;max-width:250px;line-height:1.35}
 .pg-tab th:first-child,.pg-tab td:first-child{position:sticky;left:0;z-index:1;background:var(--coluna)}
+/* Configurações: meta de dias por item */
+.metas{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}

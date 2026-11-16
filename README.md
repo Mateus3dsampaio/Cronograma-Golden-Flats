@@ -18,6 +18,7 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 
 ## Como a previsão é calculada
 - A obra é contada em turnos (manhã e tarde) dos dias trabalhados.
+- Cada item tem uma meta de dias (quatro modelos de apartamento, hall e recepção); apartamento sem modelo marcado usa o prazo geral. A meta é o ponto de partida da previsão.
 - A equipe que fica livre pega a próxima unidade, na ordem dos pavimentos; o hall é a última unidade de cada pavimento.
 - O ritmo de cada equipe vem das conclusões marcadas (turnos trabalhados ÷ unidades). Nas primeiras unidades o planejado ainda pesa, para a previsão não oscilar demais.
 - Equipe nova ou simulada entra com o ritmo médio real da obra.
@@ -30,8 +31,7 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 
 ## Valores provisórios (conferir em Configurações)
 - Distribuição dos apartamentos: 11 pavimentos com 14 e 6 com 13.
-- Hall: 1 dia por equipe.
-- Recepção: 5 dias, uma equipe, no fim da fila.
+- Meta de montagem por item (Configurações): 2 dias para cada modelo de apartamento, 1 para o hall e 5 para a recepção, que fica no fim da fila.
 - Data de início: a próxima segunda-feira.
 
 ## Rodar no computador (para testar)

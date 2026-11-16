@@ -6,7 +6,7 @@ import { formaTexto } from '../compartilhado/pagamentos.js';
  * Quem compara é o servidor, então o registro não depende do que o navegador diz.
  */
 const nomeUnidade = id => { if (id === 'R') return 'Recepção'; const [p, k] = id.split('-'); return k === 'H' ? `Hall ${p}º` : `Apto ${p}${k.padStart(2, '0')}`; };
-const ROTULOS = { nome: 'o nome da obra', inicio: 'o início da montagem', prazo: 'o prazo combinado', aptoDias: 'os dias por apartamento', hallDias: 'os dias por hall', recepDias: 'os dias da recepção', ordem: 'a ordem de montagem', margemCliente: 'a margem de segurança do cliente', base: 'a base da previsão', semana: 'os dias de trabalho', feriados: 'os feriados' };
+const ROTULOS = { nome: 'o nome da obra', inicio: 'o início da montagem', prazo: 'o prazo combinado', aptoDias: 'os dias por apartamento sem modelo', ordem: 'a ordem de montagem', margemCliente: 'a margem de segurança do cliente', base: 'a base da previsão', semana: 'os dias de trabalho', feriados: 'os feriados' };
 const valor = (k, v) => k === 'inicio' || k === 'prazo' ? (v ? fData(v) : 'sem data') : k === 'ordem' ? (v === 'asc' ? 'de baixo para cima' : 'de cima para baixo') : k === 'base' ? (v === 'plano' ? 'planejado' : 'ritmo real') : String(v);
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const MUITAS = 15; // acima disso é restauração de backup ou obra zerada: vira uma linha só
@@ -40,7 +40,8 @@ export function diferencas(antes, depois) {
   if (!igual(antes.pavs, depois.pavs)) add('config', 'Alterou os apartamentos por pavimento');
   // pagamentos: valores do contrato e modelo de cada apartamento (obra antiga, sem `pag`, não gera linha)
   if (antes.pag && depois.pag) {
-    for (const d of depois.pag.itens) { const a = antes.pag.itens.find(i => i.id === d.id); if (a && a.valor !== d.valor) add('pagamento', `Alterou o valor de ${d.nome}: de ${brl(a.valor)} para ${brl(d.valor)}`); }
+    for (const d of depois.pag.itens) { const a = antes.pag.itens.find(i => i.id === d.id); if (a && a.valor !== d.valor) add('pagamento', `Alterou o valor de ${d.nome}: de ${brl(a.valor)} para ${brl(d.valor)}`);
+      if (a && a.dias != null && a.dias !== d.dias) add('config', `Alterou a meta de montagem de ${d.nome}: de ${String(a.dias).replace('.', ',')} para ${String(d.dias).replace('.', ',')} dias`); }
     const ids = new Set([...Object.keys(antes.pag.modelos), ...Object.keys(depois.pag.modelos)]), n = [...ids].filter(id => antes.pag.modelos[id] !== depois.pag.modelos[id]);
     if (n.length === 1) add('pagamento', `Alterou o modelo do ${nomeUnidade(n[0])}`); else if (n.length) add('pagamento', `Alterou o modelo de ${n.length} apartamentos`);
   }

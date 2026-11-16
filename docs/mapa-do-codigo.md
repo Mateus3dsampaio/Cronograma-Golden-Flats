@@ -14,6 +14,7 @@ Três partes, cada uma numa pasta de `src/`:
 | Como a previsão é calculada, ritmo das equipes, simulador | `src/compartilhado/previsao.js` |
 | Dias de trabalho, feriados, contagem de turnos | `src/compartilhado/calendario.js` |
 | Valores iniciais da obra (pavimentos, dias por apto, equipes) | `src/compartilhado/estado-padrao.js` |
+| Meta de dias de cada modelo, do hall e da recepção (valores iniciais) | `src/compartilhado/pagamentos.js` (a tela fica em Configurações) |
 | O que o cliente vê e o texto do WhatsApp | `src/compartilhado/cliente.js` |
 | Regra do pagamento das equipes, percentual padrão (3%), valores do contrato | `src/compartilhado/pagamentos.js` |
 | A aba Pagamentos e o extrato em PDF | `src/publico/js/ui/telas/pagamentos.js` |
@@ -37,7 +38,7 @@ Três partes, cada uma numa pasta de `src/`:
 | `estado-padrao.js` | Obra nova (valores iniciais) e conferência do formato dos dados |
 | `calendario.js` | Transforma dias trabalhados em turnos (manhã/tarde) |
 | `previsao.js` | Motor: ritmo de cada equipe, distribuição das unidades (apartamentos, halls e a recepção, que fica no fim da fila), previsão, simulador, indicadores |
-| `pagamentos.js` | Pagamento das equipes: valores do contrato, modelo de cada apartamento, quanto cada equipe recebe por unidade (percentual ou valor fixo), soma por mês pela data da conclusão, previsão dos meses seguintes e extrato |
+| `pagamentos.js` | Itens do contrato (valor e meta de dias de cada um) e pagamento das equipes: valores do contrato, modelo de cada apartamento, quanto cada equipe recebe por unidade (percentual ou valor fixo), soma por mês pela data da conclusão, previsão dos meses seguintes e extrato |
 | `cliente.js` | Previsão por pavimento para o cliente, com margem de segurança |
 | `exemplo.js` | Obra fictícia do "modo exemplo" |
 
