@@ -201,7 +201,7 @@ button.selo{cursor:pointer}button.selo:hover{filter:brightness(1.2)}
 .sim>.terc{grid-column:1/-1}
 .terc-topo{display:grid;gap:12px;margin-bottom:14px}
 .terc-topo .veredito{font-size:14px}
-.terc-campos{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:end}
+.terc-campos{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:end}
 .terc-custo{font-size:13px}.terc-custo b{color:var(--texto)}
 .terc-tab td{white-space:nowrap}
 .terc-tab th,.terc-tab td{padding-left:10px;padding-right:10px}

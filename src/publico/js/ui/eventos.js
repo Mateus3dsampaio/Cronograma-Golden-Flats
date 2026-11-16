@@ -92,6 +92,7 @@ function aoMudar(ev) {
     if (k === 'ext-eq' || k === 'ext-mes') { app.extrato[k === 'ext-eq' ? 'e' : 'mes'] = t.value; return desenhar(false); }
     if (k === 'salario' || k === 'ajudante') { if (v == null) return desenhar(false); S.pag[k === 'salario' ? 'salarioFixa' : 'salarioAjudante'] = Math.round(v * 100) / 100; }
     else if (k === 'encargos') S.pag.encargos = Math.min(200, v || 0);
+    else if (k === 'lucro-mes') S.pag.lucroMes = Math.round((v || 0) * 100) / 100;
     else if (k === 'pct-terc') S.pag.pctTerc = v == null ? null : Math.min(100, v);
     else if (k === 'dias') { if (!(v > 0)) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).dias = Math.min(90, Math.max(.5, Math.round(v * 2) / 2)); }
     else if (k === 'valor') { if (v == null) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).valor = Math.round(v * 100) / 100; }

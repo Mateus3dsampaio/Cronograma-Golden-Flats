@@ -10,6 +10,9 @@ import { itemDe, valorPago } from './pagamentos.js';
  * em troca, a terceirizada monta parte das unidades (e a fixa deixa de ganhar o percentual delas).
  * O que sobra dessa troca é o máximo que dá para pagar à terceirizada sem a obra ficar mais cara.
  *
+ * A obra ocupa todas as equipes fixas (Mateus, 16/11/2026): enquanto ela dura, a loja não monta as próprias vendas.
+ * `lucroMes` é o lucro de um mês normal de montagens da loja; cada mês a menos de obra devolve esse lucro.
+ *
  * Premissas: a equipe nova monta no ritmo médio da obra (igual a uma fixa) e o salário só é "economizado"
  * se a equipe fixa liberada antes for produzir em outro serviço da loja.
  */
@@ -24,9 +27,10 @@ export function valorMedioApto(S) {
 /**
  * Um cenário por quantidade de equipes terceirizadas a mais (0 = só as equipes de hoje).
  * salario = salário mensal de uma equipe fixa · entrada = dia em que as novas começam · pct = % que se pretende pagar (ou null)
- * Cada cenário: { k, fim, meses, fixas, salarios, comissao, vTerc, nTerc, custoSem, economia, pctMax, porApto, custoTerc, saldo }
+ * lucroMes = lucro mensal da loja que fica parado enquanto as equipes estão na obra (0 = não considerar)
+ * Cada cenário: { k, fim, meses, fixas, salarios, parado, comissao, vTerc, nTerc, custoSem, economia, pctMax, porApto, custoTerc, saldo }
  */
-export function cenariosTerceirizar(S, R, { salario, entrada, pct = null, max = 6 }) {
+export function cenariosTerceirizar(S, R, { salario, entrada, pct = null, lucroMes = 0, max = 6 }) {
   const c = R.c, medio = valorMedioApto(S), fixas = c.ativos.filter(e => e.tipo === 'fixa').length;
   const inicio = dn(c.ag.d < S.cfg.inicio ? S.cfg.inicio : c.ag.d);
   const equipe = id => S.equipes.find(e => e.id === id);
@@ -44,11 +48,12 @@ export function cenariosTerceirizar(S, R, { salario, entrada, pct = null, max = 
       else if (pg.falta === 'modelo') comissao += medio * pg.pct / 100; // sem modelo marcado: usa o valor médio do contrato
       else aCombinar++;
     });
-    const fim = c.cal.em(prev.fimT).d, meses = Math.max(0, dn(fim) - inicio + 1) / MES, salarios = fixas * salario * meses;
-    cenarios.push({ k, fim, meses, fixas, salarios, comissao, vTerc, nTerc, aCombinar, custoSem: salarios + comissao });
+    const fim = c.cal.em(prev.fimT).d, meses = Math.max(0, dn(fim) - inicio + 1) / MES, salarios = fixas * salario * meses, parado = fixas ? lucroMes * meses : 0;
+    cenarios.push({ k, fim, meses, fixas, salarios, parado, comissao, vTerc, nTerc, aCombinar, custoSem: salarios + parado + comissao });
   }
   const base = cenarios[0];
   for (const x of cenarios) {
+    x.lucroLiberado = base.parado - x.parado;               // lucro da loja que volta por terminar antes
     x.economia = base.custoSem - x.custoSem;               // o que deixa de gastar com as equipes de hoje
     x.pctMax = x.vTerc > 0 ? x.economia / x.vTerc * 100 : null; // até quanto dá para pagar à terceirizada (empate)
     x.porApto = x.pctMax == null ? null : medio * x.pctMax / 100;

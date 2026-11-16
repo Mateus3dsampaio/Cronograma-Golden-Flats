@@ -122,6 +122,9 @@ test('vale a pena terceirizar: o teto fica perto de salário + percentual da equ
   assert.equal(custoMensalFixa(S), 4121); S.pag.encargos = 50; assert.equal(custoMensalFixa(S), 6181.5); S.pag.encargos = 0;
   const comAjudante = cenariosTerceirizar(S, R, { salario: custoMensalFixa(S), entrada: S.cfg.inicio, max: 2 });
   assert.ok(comAjudante.slice(1).every(x => x.pctMax > 6.5 && x.pctMax < 8), 'com o ajudante na conta o teto sobe para perto de 7%');
+  const comLucro = cenariosTerceirizar(S, R, { salario: custoMensalFixa(S), entrada: S.cfg.inicio, lucroMes: 30000, max: 2 });
+  assert.ok(comLucro[1].pctMax > comAjudante[1].pctMax + 5, 'o lucro parado da loja pesa mais que os salários');
+  assert.equal(Math.round(comLucro[1].lucroLiberado), Math.round(30000 * (comLucro[0].meses - comLucro[1].meses)));
   const semSalario = cenariosTerceirizar(S, R, { salario: 0, entrada: S.cfg.inicio, max: 2 });
   assert.ok(semSalario.slice(1).every(x => Math.abs(x.pctMax - 3) < .01), 'sem salário, o teto é o mesmo percentual da fixa');
 });
