@@ -1,6 +1,6 @@
 /* Celular, movimento reduzido e impressão */
 @media (max-width:1560px){#hoje-txt{display:none}}
-@media (max-width:1400px){.topo{padding:0 20px;gap:12px}.abas button{padding:0 9px;font-size:12.5px}}
+@media (max-width:1400px){.topo{padding:0 20px;gap:12px}.abas button{padding:0 8px;font-size:12.5px}.logo{gap:10px}.logo .italinea{height:20px}.logo span{gap:8px}.logo span em{font-size:12px;letter-spacing:.14em;padding-left:8px}}
 @media (max-width:1100px){
   .topo{grid-template-columns:1fr;height:auto;padding:10px 14px;gap:8px}.topo-dir{display:none}
   .abas{overflow-x:auto}.abas button{padding:0 12px;white-space:nowrap}
