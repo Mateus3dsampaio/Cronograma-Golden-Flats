@@ -3,7 +3,8 @@
 .topo::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--marca-txt) 70%,transparent),transparent)}
 .logo{display:flex;align-items:center;gap:12px;min-width:0}
 .logo b{display:block;font-size:14px;font-weight:700;letter-spacing:.3em;white-space:nowrap}
-.logo span{display:block;font-size:11px;color:var(--fraco);letter-spacing:.08em;white-space:nowrap}
+.logo span{display:flex;align-items:center;gap:9px;margin-top:4px;font-size:10px;font-weight:600;color:var(--fraco);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.logo span em{font-style:normal;padding-left:9px;border-left:1px solid var(--borda2);line-height:12px}
 .abas{position:relative;display:flex;gap:2px;padding:4px;border-radius:12px;background:rgb(20 28 38/.8);border:1px solid var(--borda)}
 .abas button{position:relative;z-index:1;height:36px;padding:0 16px;border-radius:9px;font-weight:600;font-size:13px;color:var(--suave);transition:color .2s}
 .abas button:hover{color:var(--texto)}
@@ -23,3 +24,6 @@ main{max-width:1440px;margin:0 auto;padding:22px 28px 60px}
 @keyframes subir{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 .salvo.salvando::before{background:var(--aviso);box-shadow:0 0 8px var(--aviso)}
 .salvo.erro{color:var(--alerta)}.salvo.erro::before{background:var(--alerta);box-shadow:0 0 8px var(--alerta)}
+/* Logomarca Italínea (só o nome, em branco) ao lado do nome da obra */
+.italinea{height:22px;width:auto;flex:none}
+.logo .italinea{height:15px}

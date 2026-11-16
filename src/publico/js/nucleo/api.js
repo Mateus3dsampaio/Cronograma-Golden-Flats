@@ -1,4 +1,5 @@
 import { app } from './contexto.js';
+import { garantirPagamentos } from '/compartilhado/pagamentos.js';
 
 /**
  * Conversa com o servidor: carregar a obra, gravar a cada mudança e buscar o que outro aparelho alterou.
@@ -7,7 +8,7 @@ import { app } from './contexto.js';
 let versao = 0, pendente = false, enviando = false, relogio;
 export const api = { aoStatus: () => { }, aoReceber: () => { } };
 
-function receber(j) { versao = j.versao; app.S = j.estado; app.tokenCliente = j.tokenCliente; app.persistente = j.persistente; app.usuario = j.usuario; app.fuso = j.fuso; }
+function receber(j) { versao = j.versao; app.S = garantirPagamentos(j.estado); app.tokenCliente = j.tokenCliente; app.persistente = j.persistente; app.usuario = j.usuario; app.fuso = j.fuso; }
 const irLogin = () => { location.href = '/login'; };
 
 export async function carregar() {

@@ -1,6 +1,7 @@
 import { app, agora, eq } from '../nucleo/contexto.js';
 import { carregar, novoLinkCliente, sair, carregarAtividades, carregarUsuarios, salvarUsuario, removerUsuario } from '../nucleo/api.js';
 import { estadoPadrao, estadoValido } from '/compartilhado/estado-padrao.js';
+import { garantirPagamentos } from '/compartilhado/pagamentos.js';
 import { estadoExemplo } from '/compartilhado/exemplo.js';
 import { textoCliente } from '/compartilhado/cliente.js';
 import { $, esc } from './dom.js';
@@ -25,7 +26,7 @@ const cliques = {
   'fechar-veu': (d, ev, b) => { if (ev.target === b) fecharJanela(); },
   fechar: () => fecharJanela(),
   unidade: d => janelaUnidade(d.u, d.e),
-  ir: d => { app.aba = d.aba; desenhar(true); },
+  ir: d => { app.aba = d.aba; app.extrato = null; scrollTo(0, 0); desenhar(true); buscarDadosDaAba(); },
   'filtro-ativ': d => { app.filtroAtiv = d.v; desenhar(false); },
   // usuários (só o administrador)
   'usuario-novo': async () => { const n = $('#nu-nome').value.trim(); resultadoUsuario(await salvarUsuario(n, $('#nu-senha').value), `Usuário <b>${esc(n)}</b> criado. Passe o nome e a senha para a pessoa.`); },
@@ -51,7 +52,20 @@ const cliques = {
   backup: () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(app.S, null, 1)], { type: 'application/json' })); a.download = `backup-golden-flats-${agora().d}.json`; a.click(); toast('Backup baixado. Guarde o arquivo em lugar seguro.'); },
   restaurar: () => $('#arq').click(),
   zerar: () => confirmar('Zerar tudo?', 'Apaga todas as conclusões, equipes e configurações, em todos os aparelhos. Baixe um backup antes.', 'Apagar tudo', () => { app.S = estadoPadrao(agora().d); fecharJanela(); aplicar(() => 'Tudo zerado.'); }, true),
-  demo: async () => { app.DEMO = !app.DEMO; if (app.DEMO) { app.S = estadoExemplo(agora()); app.aba = 'acomp'; } else await carregar(); app.sim.alvo = app.sim.entrada = ''; desenhar(true); if (!app.DEMO) $('#salvo').textContent = 'Salvo'; },
+  demo: async () => { app.DEMO = !app.DEMO; if (app.DEMO) { app.S = estadoExemplo(agora()); app.aba = 'acomp'; } else await carregar(); app.sim.alvo = app.sim.entrada = ''; app.extrato = null; desenhar(true); if (!app.DEMO) $('#salvo').textContent = 'Salvo'; },
+  // pagamentos
+  'pg-modo': d => { eq(d.e).pag.modo = d.v; aplicar(); },
+  'pg-extrato': d => { app.extrato = { e: d.e, mes: d.mes }; scrollTo(0, 0); desenhar(true); },
+  'pg-voltar': () => { app.extrato = null; desenhar(true); },
+  'pg-imprimir': () => { const t = document.title, x = app.extrato; document.title = `Extrato ${eq(x.e).nome} ${x.mes || 'completo'}`; print(); document.title = t; }, // o nome do PDF sai do título
+  // modelo de cada apartamento (Configurações)
+  pincel: d => { app.pincel = d.v; desenhar(false); },
+  modelo: d => { const m = app.S.pag.modelos; if (!app.pincel || m[d.u] === app.pincel) delete m[d.u]; else m[d.u] = app.pincel; aplicar(); },
+  'modelo-pav': d => { const m = app.S.pag.modelos, p = app.S.pavs.find(x => x.n === +d.andar); for (let k = 1; k <= p.q; k++) { if (app.pincel) m[p.n + '-' + k] = app.pincel; else delete m[p.n + '-' + k]; } aplicar(); },
+  'modelo-copiar': d => confirmar(`Repetir o ${d.andar}º pavimento em todos?`, 'Cada pavimento passa a ter os mesmos modelos, na mesma posição (final 01, 02…). O que já estava marcado nos outros pavimentos é substituído.', 'Repetir em todos', () => {
+    const m = app.S.pag.modelos; for (const p of app.S.pavs) if (p.n !== +d.andar) for (let k = 1; k <= p.q; k++) { const o = m[d.andar + '-' + k]; if (o) m[p.n + '-' + k] = o; else delete m[p.n + '-' + k]; }
+    fecharJanela(); aplicar(() => 'Modelos repetidos em todos os pavimentos. Confira os totais de cada modelo.');
+  }),
   // cliente
   imprimir: () => print(),
   'copiar-cliente': () => copiar(textoCliente(app.S, app.R), 'Texto copiado. Confira antes de enviar ao cliente.'),
@@ -73,11 +87,18 @@ function aoMudar(ev) {
     const maior = Math.max(0, ...Object.keys(S.feitos).filter(k => k.startsWith(p.n + '-') && !k.endsWith('H')).map(k => +k.split('-')[1]));
     if (q < maior) { toast(`O ${p.n}º pavimento já tem o apto ${p.n}${String(maior).padStart(2, '0')} concluído.`, true); return desenhar(false); }
     p.q = q; aplicar();
+  } else if (t.dataset.pg) {
+    const k = t.dataset.pg, v = t.value === '' ? null : Math.max(0, +t.value || 0);
+    if (k === 'ext-eq' || k === 'ext-mes') { app.extrato[k === 'ext-eq' ? 'e' : 'mes'] = t.value; return desenhar(false); }
+    if (k === 'valor') { if (v == null) return desenhar(false); S.pag.itens.find(i => i.id === t.dataset.id).valor = Math.round(v * 100) / 100; }
+    else if (k === 'pct') eq(t.dataset.e).pag.pct = v == null ? null : Math.min(100, v);
+    else eq(t.dataset.e).pag.fixo[k] = v == null ? null : Math.round(v * 100) / 100;
+    aplicar();
   } else if (t.dataset.sim) { app.sim[t.dataset.sim] = t.value; desenhar(false); }
   else if (t.id === 'arq' && t.files[0]) {
     t.files[0].text().then(txt => {
       const n = JSON.parse(txt); if (!estadoValido(n)) throw new Error();
-      confirmar('Restaurar este backup?', `O backup tem ${Object.keys(n.feitos).length} unidades concluídas e ${n.equipes.length} equipes. Ele substitui tudo o que está gravado hoje.`, 'Restaurar', () => { app.DEMO = false; app.S = n; fecharJanela(); aplicar(() => 'Backup restaurado.'); });
+      confirmar('Restaurar este backup?', `O backup tem ${Object.keys(n.feitos).length} unidades concluídas e ${n.equipes.length} equipes. Ele substitui tudo o que está gravado hoje.`, 'Restaurar', () => { app.DEMO = false; app.S = garantirPagamentos(n); fecharJanela(); aplicar(() => 'Backup restaurado.'); });
     }).catch(() => toast('Esse arquivo não é um backup válido.', true));
   }
 }
@@ -85,7 +106,7 @@ function aoMudar(ev) {
 export function ligarEventos() {
   document.addEventListener('click', ev => {
     const ab = ev.target.closest('[data-aba]');
-    if (ab && !ab.dataset.a) { app.aba = ab.dataset.aba; scrollTo(0, 0); desenhar(true); return buscarDadosDaAba(); }
+    if (ab && !ab.dataset.a) { app.aba = ab.dataset.aba; app.extrato = null; scrollTo(0, 0); desenhar(true); return buscarDadosDaAba(); }
     const b = ev.target.closest('[data-a]'); if (b && cliques[b.dataset.a]) cliques[b.dataset.a](b.dataset, ev, b);
   });
   document.addEventListener('change', aoMudar);

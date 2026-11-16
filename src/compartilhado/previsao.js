@@ -9,13 +9,15 @@ const PESO_PLANO = 2; // nas primeiras unidades a previsão ainda pesa o planeja
 
 /** Junta tudo o que a previsão precisa: unidades, o que foi feito e o ritmo de cada equipe. */
 export function contexto(S, ag) {
-  const cal = criarCalendario(S), A = S.cfg.aptoDias * 2, H = S.cfg.hallDias * 2;
+  const cal = criarCalendario(S), A = S.cfg.aptoDias * 2, H = S.cfg.hallDias * 2, RC = (S.cfg.recepDias ?? 5) * 2;
   const pavs = [...S.pavs].sort((a, b) => S.cfg.ordem === 'asc' ? a.n - b.n : b.n - a.n);
   const unidades = [];
   for (const p of pavs) {
     for (let k = 1; k <= p.q; k++) unidades.push({ id: p.n + '-' + k, pav: p.n, tipo: 'apto', nome: p.n + String(k).padStart(2, '0'), peso: 1 });
     unidades.push({ id: p.n + '-H', pav: p.n, tipo: 'hall', nome: 'Hall ' + p.n + 'º', peso: H / A });
   }
+  // a recepção (térreo) é uma unidade só, sem pavimento: fica no fim da fila, mas pode ser concluída ou reservada a qualquer hora
+  unidades.push({ id: 'R', pav: 0, tipo: 'recep', nome: 'Recepção', peso: RC / A });
   const porId = new Map(unidades.map(u => [u.id, u]));
   const now = cal.ini(ag.d, ag.t), T0 = cal.ini(S.cfg.inicio, 0);
   const feito = new Map();
@@ -33,7 +35,7 @@ export function contexto(S, ag) {
     }
     const gasto = peso ? Math.max(peso, ultimo - ini0 - parado) : 0; // turnos trabalhados até a última conclusão
     somaT += gasto; somaP += peso;
-    st[e.id] = { ini0, lista, peso, ultimo, gasto, bruto: peso ? gasto / peso : null, livre: Math.max(ini0, ultimo, voltou), aptos: lista.filter(x => x.u.tipo === 'apto').length, halls: lista.filter(x => x.u.tipo === 'hall').length };
+    st[e.id] = { ini0, lista, peso, ultimo, gasto, bruto: peso ? gasto / peso : null, livre: Math.max(ini0, ultimo, voltou), aptos: lista.filter(x => x.u.tipo === 'apto').length, halls: lista.filter(x => x.u.tipo === 'hall').length, recep: lista.filter(x => x.u.tipo === 'recep').length };
   }
   const ritmoGeral = (PESO_PLANO * A + somaT) / (PESO_PLANO + somaP);
   for (const e of S.equipes) { const s = st[e.id]; s.ritmo = s.peso ? (PESO_PLANO * A + s.gasto) / (PESO_PLANO + s.peso) : ritmoGeral; }
@@ -88,7 +90,8 @@ export function calcular(S, ag) {
   const prev = prever(c, lista, S.fixos);
   const tot = c.unidades.length, feitas = c.feito.size;
   const aptosTot = c.unidades.filter(u => u.tipo === 'apto').length, aptosFeitos = [...c.feito.keys()].filter(id => c.porId.get(id).tipo === 'apto').length;
-  const hallsTot = tot - aptosTot, hallsFeitos = feitas - aptosFeitos;
+  const hallsTot = c.unidades.filter(u => u.tipo === 'hall').length, hallsFeitos = [...c.feito.keys()].filter(id => c.porId.get(id).tipo === 'hall').length;
+  const recepFeita = c.feito.has('R');
   const pesoResta = c.unidades.reduce((s, u) => s + (c.feito.has(u.id) ? 0 : u.peso), 0);
   // equipe -> unidade em que está agora
   const atual = {};
@@ -98,7 +101,8 @@ export function calcular(S, ag) {
   const pav = {};
   for (const p of S.pavs) pav[p.n] = { n: p.n, tot: 0, feitos: 0, fimT: 0, and: false, incerto: false };
   for (const u of c.unidades) {
-    const p = pav[u.pav]; p.tot++;
+    const p = pav[u.pav]; if (!p) continue; // recepção não pertence a pavimento
+    p.tot++;
     if (c.feito.has(u.id)) { p.feitos++; p.fimT = Math.max(p.fimT, c.feito.get(u.id).T); }
     else if (prev && prev.plano.has(u.id)) { p.fimT = Math.max(p.fimT, prev.plano.get(u.id).fim); if (emAnd.has(u.id)) p.and = true; }
     else p.incerto = true;
@@ -119,5 +123,5 @@ export function calcular(S, ag) {
   const capacidade = c.ativos.reduce((s, e) => s + c.cal.porSemana / (base === 'plano' ? c.A : c.st[e.id].ritmo), 0);
   // equipes sem concluir nada há tempo demais
   const paradas = c.iniciou ? c.ativos.filter(e => atual[e.id] && c.now - c.st[e.id].livre > c.st[e.id].ritmo * 1.5 + 1).map(e => ({ e, dias: Math.floor((c.now - c.st[e.id].livre) / 2) })) : [];
-  return { c, prev, tot, feitas, aptosTot, aptosFeitos, hallsTot, hallsFeitos, pct: tot ? feitas / tot * 100 : 0, pesoResta, atual, emAnd, pav, liberados, proximo, fim, prazo, atraso, prox, precisa, ritmoRec, ritmoNec, capacidade, turnosAtePrazo, paradas };
+  return { c, prev, tot, feitas, aptosTot, aptosFeitos, hallsTot, hallsFeitos, recepFeita, pct: tot ? feitas / tot * 100 : 0, pesoResta, atual, emAnd, pav, liberados, proximo, fim, prazo, atraso, prox, precisa, ritmoRec, ritmoNec, capacidade, turnosAtePrazo, paradas };
 }

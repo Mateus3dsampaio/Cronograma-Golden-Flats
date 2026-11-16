@@ -1,11 +1,12 @@
-import { fCurta, fData, TURNO } from '../compartilhado/datas.js';
+import { fCurta, fData, TURNO, brl } from '../compartilhado/datas.js';
+import { formaTexto } from '../compartilhado/pagamentos.js';
 
 /**
  * Registro de atividades: compara a obra antes e depois de uma gravação e descreve o que mudou.
  * Quem compara é o servidor, então o registro não depende do que o navegador diz.
  */
-const nomeUnidade = id => { const [p, k] = id.split('-'); return k === 'H' ? `Hall ${p}º` : `Apto ${p}${k.padStart(2, '0')}`; };
-const ROTULOS = { nome: 'o nome da obra', inicio: 'o início da montagem', prazo: 'o prazo combinado', aptoDias: 'os dias por apartamento', hallDias: 'os dias por hall', ordem: 'a ordem de montagem', margemCliente: 'a margem de segurança do cliente', base: 'a base da previsão', semana: 'os dias de trabalho', feriados: 'os feriados' };
+const nomeUnidade = id => { if (id === 'R') return 'Recepção'; const [p, k] = id.split('-'); return k === 'H' ? `Hall ${p}º` : `Apto ${p}${k.padStart(2, '0')}`; };
+const ROTULOS = { nome: 'o nome da obra', inicio: 'o início da montagem', prazo: 'o prazo combinado', aptoDias: 'os dias por apartamento', hallDias: 'os dias por hall', recepDias: 'os dias da recepção', ordem: 'a ordem de montagem', margemCliente: 'a margem de segurança do cliente', base: 'a base da previsão', semana: 'os dias de trabalho', feriados: 'os feriados' };
 const valor = (k, v) => k === 'inicio' || k === 'prazo' ? (v ? fData(v) : 'sem data') : k === 'ordem' ? (v === 'asc' ? 'de baixo para cima' : 'de cima para baixo') : k === 'base' ? (v === 'plano' ? 'planejado' : 'ritmo real') : String(v);
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const MUITAS = 15; // acima disso é restauração de backup ou obra zerada: vira uma linha só
@@ -31,11 +32,18 @@ export function diferencas(antes, depois) {
     if (!a) add('equipe', `Adicionou a equipe ${d.nome}`);
     else if (a.ativa && !d.ativa) add('equipe', `Retirou a equipe ${d.nome} da obra`);
     else if (!a.ativa && d.ativa) add('equipe', `Reativou a equipe ${d.nome}`);
-    else if (a.nome !== d.nome || a.tipo !== d.tipo || a.entrada !== d.entrada) add('equipe', `Editou a equipe ${d.nome}${a.nome !== d.nome ? ` (antes: ${a.nome})` : ''}`); }
+    else if (a.nome !== d.nome || a.tipo !== d.tipo || a.entrada !== d.entrada) add('equipe', `Editou a equipe ${d.nome}${a.nome !== d.nome ? ` (antes: ${a.nome})` : ''}`);
+    if (a && a.pag && d.pag && !igual(a.pag, d.pag)) add('pagamento', `Alterou o pagamento da equipe ${d.nome}: ${formaTexto(d, brl)} (antes: ${formaTexto(a, brl)})`); }
   for (const a of antes.equipes) if (!depois.equipes.some(e => e.id === a.id)) add('equipe', `Excluiu a equipe ${a.nome}`);
   // configurações
   for (const k in ROTULOS) if (!igual(antes.cfg[k], depois.cfg[k])) add('config', Array.isArray(depois.cfg[k]) ? `Alterou ${ROTULOS[k]}` : `Alterou ${ROTULOS[k]}: de ${valor(k, antes.cfg[k])} para ${valor(k, depois.cfg[k])}`);
   if (!igual(antes.pavs, depois.pavs)) add('config', 'Alterou os apartamentos por pavimento');
+  // pagamentos: valores do contrato e modelo de cada apartamento (obra antiga, sem `pag`, não gera linha)
+  if (antes.pag && depois.pag) {
+    for (const d of depois.pag.itens) { const a = antes.pag.itens.find(i => i.id === d.id); if (a && a.valor !== d.valor) add('pagamento', `Alterou o valor de ${d.nome}: de ${brl(a.valor)} para ${brl(d.valor)}`); }
+    const ids = new Set([...Object.keys(antes.pag.modelos), ...Object.keys(depois.pag.modelos)]), n = [...ids].filter(id => antes.pag.modelos[id] !== depois.pag.modelos[id]);
+    if (n.length === 1) add('pagamento', `Alterou o modelo do ${nomeUnidade(n[0])}`); else if (n.length) add('pagamento', `Alterou o modelo de ${n.length} apartamentos`);
+  }
   if (!antes.conferido && depois.conferido) add('config', 'Marcou os dados da obra como conferidos');
   return itens;
 }

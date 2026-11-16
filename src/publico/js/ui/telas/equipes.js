@@ -10,7 +10,7 @@ export function equipes() {
     const s = c.st[e.id], at = e.ativa && R.atual[e.id], sl = at && c.cal.em(at.fim), ult = s.lista[s.lista.length - 1];
     return `<div class="card eq ${e.ativa ? '' : 'fora'}"><div class="cab"><i class="ponto" style="color:${cor(e)};background:${cor(e)};width:12px;height:12px"></i><b>${esc(e.nome)}</b>
       ${melhor === e ? '<span class="selo av">★ mais rápida</span>' : ''}<span class="selo ${e.tipo === 'fixa' ? 'mc' : 'nt'}">${e.tipo === 'fixa' ? 'fixa' : 'terceirizada'}</span></div>
-      <div class="nums"><div><b>${s.aptos + s.halls}</b><span>${s.halls ? s.aptos + ' aptos · ' + s.halls + ' halls' : 'concluídas'}</span></div>
+      <div class="nums"><div><b>${s.lista.length}</b><span>${s.halls || s.recep ? s.aptos + ' aptos · ' + s.halls + ' halls' + (s.recep ? ' · recepção' : '') : 'concluídas'}</span></div>
         <div><b>${s.bruto ? diasApto(s.bruto) : '—'}</b><span>dias/apto real</span></div>
         <div><b>${diasApto(S.cfg.base === 'plano' ? c.A : s.ritmo)}</b><span>dias/apto previsão</span></div></div>
       <div class="agora">${!e.ativa ? '<span class="mudo">Fora da obra. O histórico continua valendo nas médias.</span>' : at ? `<div><span class="mudo">${c.iniciou ? 'Agora em' : 'Começa por'}</span> <b>${esc(at.u.nome)}</b><br><span class="mudo">previsão ${fSem(sl.d)} · ${TURNO[sl.t]}</span></div><button class="btn pri mini" data-a="unidade" data-u="${at.u.id}" data-e="${e.id}">Concluir</button>` : '<span class="mudo">Sem unidade na fila.</span>'}</div>

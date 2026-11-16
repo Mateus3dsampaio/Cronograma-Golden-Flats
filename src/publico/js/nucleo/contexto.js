@@ -10,6 +10,8 @@ export const app = {
   tokenCliente: '', persistente: true,
   usuario: { nome: '', admin: false }, fuso: 'America/Fortaleza',
   usuarios: null,         // lista de usuários (só o administrador carrega)
+  extrato: null,          // extrato aberto na aba Pagamentos: { e: id da equipe, mes: "AAAA-MM" ou '' }
+  pincel: 'm1',           // modelo escolhido para marcar os apartamentos em Configurações ('' = apagar)
   atividades: null, filtroAtiv: '', // registro de atividades e o filtro por pessoa
 };
 

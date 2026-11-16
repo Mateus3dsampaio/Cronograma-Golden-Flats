@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { config, agora } from './config.js';
 import { estadoPadrao } from '../compartilhado/estado-padrao.js';
 import { diferencas, carimbar } from './atividades.js';
+import { garantirPagamentos } from '../compartilhado/pagamentos.js';
 
 /**
  * Tudo o que fica gravado no Volume:
@@ -24,6 +25,7 @@ export function criarArmazenamento(pasta = config.pastaDados) {
   const gravarJson = (n, dado) => { const txt = JSON.stringify(dado); fs.writeFileSync(arq(n) + '.tmp', txt); fs.renameSync(arq(n) + '.tmp', arq(n)); return txt; };
 
   let obra = lerJson('obra.json', null) || { versao: 0, tokenCliente: novoToken(), estado: estadoPadrao(agora().d) };
+  garantirPagamentos(obra.estado); // obra gravada antes dos pagamentos e da recepção
   let usuarios = lerJson('usuarios.json', []);
   const atividades = lerJson('atividades.json', []);
 
@@ -47,7 +49,7 @@ export function criarArmazenamento(pasta = config.pastaDados) {
     /** Grava se a versão de quem enviou ainda é a atual; carimba e registra o que mudou. Devolve false se outro aparelho gravou antes. */
     gravar(estado, versaoDeQuemEnviou, usuario) {
       if (versaoDeQuemEnviou !== obra.versao) return false;
-      const em = new Date().toISOString();
+      const em = new Date().toISOString(); garantirPagamentos(estado);
       carimbar(obra.estado, estado, usuario, em);
       const itens = diferencas(obra.estado, estado);
       obra.estado = estado; persistirObra(); registrar(usuario, itens, em); return true;

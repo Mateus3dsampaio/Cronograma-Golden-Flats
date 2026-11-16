@@ -135,3 +135,63 @@
 .usuarios{display:grid;gap:8px}
 .usuario{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:#111922;border:1px solid var(--borda)}
 .usuario .rod{margin-left:auto;display:flex;gap:8px}
+
+/* Acompanhamento: linha do térreo (recepção) */
+.pav.terreo{margin-top:6px;padding-top:9px;border-top:1px dashed var(--borda2);border-radius:0 0 10px 10px}
+.pav.terreo .cel{grid-column:1/span 4}
+
+/* Pagamentos */
+.pg-kpis{grid-template-columns:repeat(4,1fr)}
+.pg-kpis .kpi{min-height:112px}.pg-kpis .kpi .v{font-size:27px}
+button.selo{cursor:pointer}button.selo:hover{filter:brightness(1.2)}
+.rolagem{overflow-x:auto}
+.pg-tab th,.pg-tab td{white-space:nowrap}
+.pg-tab th.atual{color:var(--marca-txt)}
+.pg-tab td small,.pg-tab tfoot small{display:block;font-size:11px;color:var(--fraco);font-weight:500;margin-top:2px}
+.pg-tab tfoot td,.pg-tab tfoot td:first-child{border-top:1px solid var(--borda2);background:color-mix(in srgb,#fff 2%,var(--coluna))}
+.pg-nome{display:flex;align-items:center;gap:8px}
+.pg-tab .pg-nome+small{margin-left:17px}
+.pg-v{font-weight:700;font-size:14px;padding:3px 8px;margin:-3px -8px;border-radius:7px;transition:background .2s,color .2s}
+.pg-v:hover{background:color-mix(in srgb,var(--marca) 26%,transparent);color:#fff}
+.pg-v i{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:6px;border-radius:50%;background:var(--aviso);color:#2a1c02;font-size:10px;font-style:normal;font-weight:800;vertical-align:1px}
+.pg-baixo{grid-template-columns:1.25fr 1fr;align-items:start}
+.pg-eqs{display:grid;gap:8px}
+.pg-eq{display:grid;grid-template-columns:minmax(150px,1fr) auto minmax(180px,1.5fr);align-items:center;gap:14px;padding:10px 12px;border-radius:10px;background:#111922;border:1px solid var(--borda)}
+.pg-eq.fora{opacity:.6}
+.pg-eq .pg-nome{flex-wrap:wrap}
+.pg-campos{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.pg-campos .campo{font-size:11px}
+.pg-contrato td{padding:7px 14px}
+.pg-valor input{width:140px;text-align:right;margin-left:auto}
+.pg-sel{width:210px}
+/* Extrato da equipe (a folha que vira PDF) */
+.extrato{padding:28px 30px}
+.ext-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
+.ext-cab h2{font-size:24px;letter-spacing:-.01em;margin:4px 0 2px}
+.ext-marcas{display:flex;align-items:center;gap:14px}
+.ext-marcas .italinea{height:26px}
+.ext-marcas span{font-size:13px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;padding-left:14px;border-left:1px solid var(--borda2)}
+.ext-dados{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:13px;padding:14px 16px;border-radius:10px;background:#111922;border:1px solid var(--borda);margin-bottom:16px}
+.ext-dados dt{color:var(--fraco)}.ext-dados dd{font-weight:600}
+.ext-tab tfoot td{border-top:1px solid var(--borda2);padding-top:14px}
+.ext-total{font-size:20px}
+.ext-tab td.dir,.ext-tab td:nth-child(2),.ext-tab td:nth-child(4),.ext-tab tfoot td{white-space:nowrap}
+.ext-ass{display:none}
+
+/* Configurações: modelo de cada apartamento */
+.cfg>.mods{grid-column:1/-1}
+.mods{--m0:#3a4656;--m1:#7ba3f0;--m2:#4fd184;--m3:#f0a06a;--m4:#b697ee}
+.mod-pinceis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.mod-p{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#0d141f;border:1px solid var(--borda2);text-align:left;transition:all .2s var(--mola)}
+.mod-p i{width:14px;height:14px;border-radius:4px;flex:none;background:var(--c);box-shadow:0 0 10px color-mix(in srgb,var(--c) 60%,transparent)}
+.mod-p b{display:block;font-size:13px}.mod-p small{font-size:11px;color:var(--fraco)}.mod-p small.certo{color:var(--ok)}
+.mod-p:hover{border-color:var(--c)}
+.mod-p.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,#0d141f);box-shadow:0 0 0 1px var(--c),0 0 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.m0{--c:var(--m0)}.m1{--c:var(--m1)}.m2{--c:var(--m2)}.m3{--c:var(--m3)}.m4{--c:var(--m4)}
+.mod-mapa{display:grid;gap:5px}
+.mod-pav{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:16px;padding:2px 8px}
+.mod-pav .n{font-weight:700;font-size:13px;color:var(--suave)}.mod-pav .n small{color:var(--fraco);font-weight:500}
+.mod-pav .rod{display:flex;gap:6px}
+.cel.mod:not(.m0){color:#fff;border-color:var(--c);background:color-mix(in srgb,var(--c) 30%,#111922)}
+.pg-tab td:first-child small{white-space:normal;max-width:250px;line-height:1.35}
+.pg-tab th:first-child,.pg-tab td:first-child{position:sticky;left:0;z-index:1;background:var(--coluna)}

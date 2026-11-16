@@ -1,6 +1,6 @@
 # Cronograma Golden Flats
 
-Acompanhamento da montagem do hotel Golden Flats (232 apartamentos + 17 halls) pela Eccellenza.
+Acompanhamento da montagem do hotel Golden Flats (232 apartamentos + 17 halls + recepção) pela Eccellenza.
 Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no computador.
 
 - **Colocar no ar:** `docs/colocar-no-ar.md`
@@ -11,9 +11,10 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 - **Cronograma**: linha do tempo por equipe, dia dividido em manhã e tarde.
 - **Equipes**: cadastrar, editar, retirar e reativar. O cronograma se refaz na hora.
 - **Simulador**: quantas equipes são necessárias para terminar numa data.
+- **Pagamentos**: quanto cada equipe recebe em cada mês, como cada uma é paga (percentual do valor da unidade ou valor fixo), valores do contrato e extrato por equipe em PDF.
 - **Cliente**: previsão de liberação de cada pavimento, link só de leitura para o cliente, impressão e texto para WhatsApp.
 - **Atividades**: registro de quem fez o quê, com data e hora de Fortaleza.
-- **Configurações**: datas, dias de trabalho, feriados, apartamentos por pavimento, backup e usuários (só o administrador).
+- **Configurações**: datas, dias de trabalho, feriados, apartamentos por pavimento, modelo de cada apartamento, backup e usuários (só o administrador).
 
 ## Como a previsão é calculada
 - A obra é contada em turnos (manhã e tarde) dos dias trabalhados.
@@ -21,9 +22,16 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 - O ritmo de cada equipe vem das conclusões marcadas (turnos trabalhados ÷ unidades). Nas primeiras unidades o planejado ainda pesa, para a previsão não oscilar demais.
 - Equipe nova ou simulada entra com o ritmo médio real da obra.
 
+## Como o pagamento é calculado
+- A equipe recebe pelo que concluiu dentro do mês. Vale a data da conclusão: até o último dia entra no mês; no dia 1º já é do mês seguinte.
+- Equipe fixa: 3% do valor da unidade por padrão. Terceirizada: entra "a combinar" até o Mateus preencher o percentual ou o valor fixo por unidade.
+- O valor da unidade vem do contrato (quatro modelos de apartamento, hall e recepção). O modelo de cada apartamento é marcado em Configurações; apartamento sem modelo fica fora da soma e aparece como pendência.
+- Todos os usuários com login veem a aba Pagamentos (decisão do Mateus em 16/11/2026).
+
 ## Valores provisórios (conferir em Configurações)
 - Distribuição dos apartamentos: 11 pavimentos com 14 e 6 com 13.
 - Hall: 1 dia por equipe.
+- Recepção: 5 dias, uma equipe, no fim da fila.
 - Data de início: a próxima segunda-feira.
 
 ## Rodar no computador (para testar)

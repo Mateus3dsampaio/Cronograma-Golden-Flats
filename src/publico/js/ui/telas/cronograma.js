@@ -10,7 +10,7 @@ export function cronograma() {
   const { S, R } = app, { c, prev } = R;
   const a = c.T0, b = Math.ceil(Math.max(prev ? prev.fimT : 0, c.now, ...[...c.feito.values()].map(f => f.T))) + 8, n = b - a;
   const X = T => NOME + (T - a) * W;
-  const bloco = (cls, ini, fim, u, dica) => { const l = X(Math.max(ini, a)), w = Math.max(W - 2, X(fim) - l - 2); return `<button class="blk ${cls}" style="left:${l}px;width:${w}px" data-a="unidade" data-u="${u.id}" data-dica="${esc(dica)}">${w >= 26 ? (u.tipo === 'hall' ? 'H' + u.pav : u.nome) : ''}</button>`; };
+  const bloco = (cls, ini, fim, u, dica) => { const l = X(Math.max(ini, a)), w = Math.max(W - 2, X(fim) - l - 2); return `<button class="blk ${cls}" style="left:${l}px;width:${w}px" data-a="unidade" data-u="${u.id}" data-dica="${esc(dica)}">${w >= 26 ? (u.tipo === 'hall' ? 'H' + u.pav : u.tipo === 'recep' ? 'REC' : u.nome) : ''}</button>`; };
   // cabeçalho: meses e dias
   let cab = '', grade = '', mesAnt = '';
   for (let i = a; i < b; i++) {

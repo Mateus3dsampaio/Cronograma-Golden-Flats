@@ -2,6 +2,7 @@ import { app, agora, eq } from '../nucleo/contexto.js';
 import { salvar } from '../nucleo/api.js';
 import { dn, fData, fCurta, plural, TURNO } from '/compartilhado/datas.js';
 import { $, esc, CORES } from './dom.js';
+import { pagEquipePadrao } from '/compartilhado/pagamentos.js';
 import { desenhar } from './desenhar.js';
 import { toast, fecharJanela } from './janelas.js';
 
@@ -29,7 +30,7 @@ export const acoes = {
   reservar(id, e) { if (e) app.S.fixos[id] = e; else delete app.S.fixos[id]; fecharJanela(); aplicar(() => e ? `<b>${nomeUn(id)}</b> reservado para ${esc(eq(e).nome)}` : 'Reserva retirada'); },
   novaEquipe(nome, tipo, entrada) {
     const S = app.S, usadas = new Set(S.equipes.map(e => e.cor)); let c = 0; while (usadas.has(c) && c < CORES.length) c++;
-    S.equipes.push({ id: 'e' + (S.seq++), nome, tipo, cor: c % CORES.length, ativa: true, entrada, pausas: [] });
+    S.equipes.push({ id: 'e' + (S.seq++), nome, tipo, cor: c % CORES.length, ativa: true, entrada, pausas: [], pag: pagEquipePadrao(tipo) });
     aplicar(() => `Equipe <b>${esc(nome)}</b> entrou na obra. Cronograma reorganizado.`);
   },
   retirar(id) {

@@ -7,3 +7,4 @@
 .cartao-entrada .campo{text-align:left;margin-top:8px}
 .cartao-entrada #erro{color:var(--alerta);font-size:13px;min-height:19px}
 @keyframes subir{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.entrada>.italinea{height:26px;margin-top:22px;opacity:.8;animation:subir .7s var(--mola) .55s both}

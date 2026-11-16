@@ -2,6 +2,7 @@ import { app } from '../../nucleo/contexto.js';
 import { APTOS_CONTRATO } from '/compartilhado/estado-padrao.js';
 import { DS, fSem } from '/compartilhado/datas.js';
 import { esc } from '../dom.js';
+import { modelosApto } from '/compartilhado/pagamentos.js';
 
 const ROT = ['não trabalha', 'só manhã', 'dia inteiro'];
 
@@ -16,6 +17,7 @@ export function configuracoes() {
         <label class="campo">Prazo combinado com o cliente<input type="date" data-cfg="prazo" value="${c.prazo}"></label>
         <label class="campo">Dias por apartamento (1 equipe)<input type="number" step="0.5" min="0.5" max="30" data-cfg="aptoDias" value="${c.aptoDias}"></label>
         <label class="campo">Dias por hall (provisório)<input type="number" step="0.5" min="0.5" max="30" data-cfg="hallDias" value="${c.hallDias}"></label>
+        <label class="campo tudo">Dias da recepção (provisório · 1 unidade, no fim da fila)<input type="number" step="0.5" min="0.5" max="60" data-cfg="recepDias" value="${c.recepDias}"></label>
         <div class="campo tudo">Ordem de montagem<div class="seg"><button class="${c.ordem === 'asc' ? 'on' : ''}" data-a="ordem" data-v="asc">De baixo para cima</button><button class="${c.ordem === 'desc' ? 'on' : ''}" data-a="ordem" data-v="desc">De cima para baixo</button></div></div>
         <div class="campo tudo">Base da previsão<div class="seg"><button class="${c.base === 'real' ? 'on' : ''}" data-a="base" data-v="real">Ritmo real das equipes</button><button class="${c.base === 'plano' ? 'on' : ''}" data-a="base" data-v="plano">Sempre o planejado</button></div></div></div></div>
       <div class="card"><div class="rot">Dias de trabalho · clique para alternar</div>
@@ -25,7 +27,7 @@ export function configuracoes() {
         <div class="fer">${[...c.feriados].sort().map(f => `<span class="selo nt">${fSem(f)}/${f.slice(2, 4)}<button data-a="fer-del" data-d="${f}" aria-label="Remover">×</button></span>`).join('') || '<span class="mudo">Nenhum cadastrado.</span>'}</div></div>
     </div>
     <div class="grade">
-      <div class="card"><div class="rot"><span>Apartamentos por pavimento</span><span class="selo ${totA === APTOS_CONTRATO ? 'ok' : 'av'}">${totA} aptos + ${S.pavs.length} halls${totA === APTOS_CONTRATO ? '' : ' · contrato: ' + APTOS_CONTRATO}</span></div>
+      <div class="card"><div class="rot"><span>Apartamentos por pavimento</span><span class="selo ${totA === APTOS_CONTRATO ? 'ok' : 'av'}">${totA} aptos + ${S.pavs.length} halls + recepção${totA === APTOS_CONTRATO ? '' : ' · contrato: ' + APTOS_CONTRATO}</span></div>
         <div class="pavs-cfg">${S.pavs.map((p, i) => `<label>${p.n}º pavimento<input type="number" min="0" max="40" data-pav="${i}" value="${p.q}"></label>`).join('')}</div>
         <div class="linha" style="margin-top:14px"><button class="btn mini" data-a="pav-add">+ Pavimento</button><button class="btn mini" data-a="pav-del" ${S.pavs.length > 1 ? '' : 'disabled'}>Remover o último</button><span class="mudo" style="font-size:12px">Numeração: 3º pavimento = 301, 302… Cada pavimento tem 1 hall.</span></div></div>
       <div class="card"><div class="rot">Dados e backup</div>
@@ -33,7 +35,22 @@ export function configuracoes() {
         <div class="linha"><button class="btn pri" data-a="backup">Baixar backup</button>${adm ? '<button class="btn" data-a="restaurar">Restaurar backup</button><input type="file" id="arq" accept=".json" hidden>' : ''}
           <button class="btn" data-a="demo">${DEMO ? 'Sair do exemplo' : 'Ver com dados de exemplo'}</button>${adm ? '<button class="btn perigo" data-a="zerar">Zerar tudo</button>' : ''}</div></div>
       ${adm && !DEMO ? usuarios() : ''}
-    </div></div>`;
+    </div>
+    ${modelos()}</div>`;
+}
+
+/** Mapa para marcar o modelo de cada apartamento: escolhe o modelo e clica nos apartamentos. */
+function modelos() {
+  const { S } = app, mods = modelosApto(S), m = S.pag.modelos, conta = {}, maxQ = Math.max(1, ...S.pavs.map(p => p.q));
+  for (const p of S.pavs) for (let k = 1; k <= p.q; k++) { const id = m[p.n + '-' + k]; if (id) conta[id] = (conta[id] || 0) + 1; }
+  const falta = S.pavs.reduce((s, p) => s + p.q, 0) - Object.values(conta).reduce((s, n) => s + n, 0);
+  return `<div class="card mods"><div class="rot"><span>Modelo de cada apartamento · escolha o modelo e clique nos apartamentos</span><span class="selo ${falta ? 'av' : 'ok'}">${falta ? falta + ' sem modelo' : 'todos marcados'}</span></div>
+    <div class="mod-pinceis">${mods.map((x, i) => `<button class="mod-p m${i + 1} ${app.pincel === x.id ? 'on' : ''}" data-a="pincel" data-v="${x.id}"><i></i><span><b>${esc(x.nome)}</b><small class="${(conta[x.id] || 0) === x.qtd ? 'certo' : ''}">${conta[x.id] || 0} de ${x.qtd} do contrato</small></span></button>`).join('')}
+      <button class="mod-p m0 ${app.pincel ? '' : 'on'}" data-a="pincel" data-v=""><i></i><span><b>Apagar</b><small>tira o modelo</small></span></button></div>
+    <div class="mod-mapa">${[...S.pavs].sort((a, b) => b.n - a.n).map(p => `<div class="mod-pav"><div class="n">${p.n}º <small>pav</small></div>
+      <div class="cels" style="grid-template-columns:repeat(${maxQ},minmax(0,1fr))">${Array.from({ length: p.q }, (_, i) => { const id = p.n + '-' + (i + 1), k = mods.findIndex(x => x.id === m[id]); return `<button class="cel mod m${k + 1}" data-a="modelo" data-u="${id}" data-dica="${p.n}${String(i + 1).padStart(2, '0')} · ${k < 0 ? 'sem modelo' : esc(mods[k].nome)}">${p.n}${String(i + 1).padStart(2, '0')}</button>`; }).join('')}</div>
+      <div class="rod"><button class="btn mini" data-a="modelo-pav" data-andar="${p.n}" data-dica="Marca o pavimento inteiro com o modelo escolhido">Pavimento todo</button><button class="btn mini" data-a="modelo-copiar" data-andar="${p.n}" data-dica="Copia a sequência deste pavimento para todos os outros">Repetir nos outros</button></div></div>`).join('')}</div>
+    <p class="mudo" style="margin-top:12px;font-size:12px">O modelo define o valor da unidade na aba Pagamentos. Se os pavimentos repetem a mesma sequência, marque um e use "Repetir nos outros". Clicar de novo num apartamento com o mesmo modelo tira a marcação.</p></div>`;
 }
 
 /** Cartão de usuários (só o administrador vê). */

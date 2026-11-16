@@ -2,7 +2,7 @@ import { app } from '../../nucleo/contexto.js';
 import { esc } from '../dom.js';
 import { fQuando } from '../formato.js';
 
-const SELO = { concluiu: ['ok', 'Conclusão'], desfez: ['al', 'Desfeita'], corrigiu: ['av', 'Correção'], massa: ['al', 'Em massa'], reserva: ['mc', 'Reserva'], equipe: ['mc', 'Equipe'], config: ['nt', 'Configuração'], usuario: ['nt', 'Usuário'] };
+const SELO = { concluiu: ['ok', 'Conclusão'], desfez: ['al', 'Desfeita'], corrigiu: ['av', 'Correção'], massa: ['al', 'Em massa'], reserva: ['mc', 'Reserva'], equipe: ['mc', 'Equipe'], config: ['nt', 'Configuração'], pagamento: ['av', 'Pagamento'], usuario: ['nt', 'Usuário'] };
 
 /** Aba Atividades: quem fez o quê e quando (horário de Fortaleza). O registro é feito pelo servidor. */
 export function atividades() {

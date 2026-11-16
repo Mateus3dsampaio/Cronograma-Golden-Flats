@@ -12,8 +12,9 @@ import { simulador } from './telas/simulador.js';
 import { cliente } from './telas/cliente.js';
 import { configuracoes } from './telas/configuracoes.js';
 import { atividades } from './telas/atividades.js';
+import { pagamentos } from './telas/pagamentos.js';
 
-const telas = { acomp: acompanhamento, crono: cronograma, equipes, simul: simulador, cliente, ativ: atividades, config: configuracoes };
+const telas = { acomp: acompanhamento, crono: cronograma, equipes, simul: simulador, pagam: pagamentos, cliente, ativ: atividades, config: configuracoes };
 
 /** Refaz as contas e redesenha a aba aberta. `animar` = entrada com animação (troca de aba). */
 export function desenhar(animar) {
@@ -33,7 +34,7 @@ export function desenhar(animar) {
   $('#nome-obra').textContent = S.cfg.nome.toUpperCase(); document.title = S.cfg.nome + ' · Cronograma de montagem';
   $('#usuario-txt').textContent = app.usuario.nome;
   $('#hoje-txt').textContent = fSem(R.c.ag.d) + '/' + R.c.ag.d.slice(0, 4);
-  if (app.DEMO) $('#salvo').textContent = 'Modo exemplo (não grava)';
+  if (app.DEMO) $('#salvo').textContent = 'Exemplo';
   $('#demo-faixa').innerHTML = app.DEMO ? '<div class="demo-faixa">MODO EXEMPLO · dados fictícios para você ver como fica. Nada aqui é gravado.<button data-a="demo">Sair do exemplo</button></div>' : '';
   $$('#abas button').forEach(b => b.classList.toggle('on', b.dataset.aba === app.aba));
   const on = $('#abas button.on'), ind = $('#abas i'); ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';

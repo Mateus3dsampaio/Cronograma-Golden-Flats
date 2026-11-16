@@ -8,15 +8,18 @@ import { estadoExemplo } from '../src/compartilhado/exemplo.js';
 const HOJE = { d: '2026-11-14', t: 1 }; // sábado; a obra padrão começa na segunda 16/11
 const nova = () => estadoPadrao(HOJE.d);
 
-test('obra padrão: 232 aptos + 17 halls, começa na segunda', () => {
+test('obra padrão: 232 aptos + 17 halls + recepção, começa na segunda', () => {
   const S = nova(), R = calcular(S, HOJE);
   assert.equal(S.cfg.inicio, '2026-11-16');
-  assert.equal(R.aptosTot, 232); assert.equal(R.hallsTot, 17); assert.equal(R.tot, 249);
+  assert.equal(R.aptosTot, 232); assert.equal(R.hallsTot, 17); assert.equal(R.tot, 250); assert.equal(R.recepFeita, false);
 });
 
-test('4 equipes a 2 dias por apto e 1 dia por hall terminam em 03/05/2027', () => {
-  // 232 x 2 + 17 x 1 = 481 dias de equipe / 4 equipes = 120,25 dias úteis a partir de 16/11/2026
-  assert.equal(calcular(nova(), HOJE).fim.d, '2027-05-03');
+test('4 equipes a 2 dias por apto, 1 por hall e 5 pela recepção terminam em 07/05/2027', () => {
+  // 232 x 2 + 17 x 1 = 481 dias de equipe / 4 equipes = 120,25 dias úteis a partir de 16/11/2026 (03/05/2027);
+  // a recepção fica no fim da fila: uma equipe só, mais 5 dias úteis
+  assert.equal(calcular(nova(), HOJE).fim.d, '2027-05-07');
+  const S = nova(); S.feitos.R = { d: '2026-11-16', t: 0, e: 'e1' };
+  assert.ok(calcular(S, HOJE).fim.d < '2027-05-07', 'recepção concluída sai da fila');
 });
 
 test('mais equipes terminam antes; sem equipe não há previsão', () => {

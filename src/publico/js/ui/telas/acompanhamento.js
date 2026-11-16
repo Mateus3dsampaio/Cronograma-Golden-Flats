@@ -40,7 +40,7 @@ function heroi() {
     <div class="rot">Montagem concluída</div>
     <div class="pct"><span data-n="${R.pct}" data-dec="1">${num(R.pct, 1)}</span><small>%</small></div>
     <div class="barra ${R.pct === 100 ? 'ok' : ''}" style="margin-top:12px"><i style="width:${R.pct}%"></i></div>
-    <dl><dt>Apartamentos</dt><dd>${R.aptosFeitos} / ${R.aptosTot}</dd><dt>Halls</dt><dd>${R.hallsFeitos} / ${R.hallsTot}</dd>
+    <dl><dt>Apartamentos</dt><dd>${R.aptosFeitos} / ${R.aptosTot}</dd><dt>Halls</dt><dd>${R.hallsFeitos} / ${R.hallsTot}</dd><dt>Recepção</dt><dd>${R.recepFeita ? 'concluída' : 'a fazer'}</dd>
       <dt>Em montagem</dt><dd>${plural(R.emAnd.size, 'unidade', 'unidades')}</dd><dt>Faltam</dt><dd>${plural(R.tot - R.feitas, 'unidade', 'unidades')}</dd>
       <dt>Pav. liberados</dt><dd>${R.liberados} / ${S.pavs.length}</dd><dt>Pav. em andamento</dt><dd>${emPav}</dd>
       ${R.proximo ? `<dt>Próximo a liberar</dt><dd>${R.proximo.n}º · ${fSem(c.cal.em(R.proximo.fimT).d)}</dd>` : ''}</dl>
@@ -78,15 +78,15 @@ function indicadores() {
 function predio() {
   const { S, R } = app, { c, prev } = R, maxQ = Math.max(1, ...S.pavs.map(p => p.q)); let i = 0;
   const cel = u => {
-    const f = c.feito.get(u.id), e = R.emAnd.get(u.id), pl = prev && prev.plano.get(u.id), rot = u.tipo === 'hall' ? 'HALL' : u.nome;
-    let cls = 'cel' + (u.tipo === 'hall' ? ' hall' : ''), est = `style="--i:${i++}"`, dica;
+    const f = c.feito.get(u.id), e = R.emAnd.get(u.id), pl = prev && prev.plano.get(u.id), rot = u.tipo === 'hall' ? 'HALL' : u.tipo === 'recep' ? 'RECEPÇÃO' : u.nome;
+    let cls = 'cel' + (u.tipo === 'apto' ? '' : ' hall'), est = `style="--i:${i++}"`, dica;
     if (f) { cls += ' ok t' + f.t; dica = `${u.nome}\nConcluído ${fSem(f.d)} · ${TURNO[f.t]}\n${eq(f.e) ? eq(f.e).nome : ''}${f.por ? '\n' + marcadoPor(f) : ''}`; }
     else if (e) { cls += ' and'; est = `style="--c:${cor(eq(e))};--i:${i}"`; const s = c.cal.em(pl.fim); dica = `${u.nome}\nEm montagem · ${eq(e).nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}`; }
     else if (pl) { const s = c.cal.em(pl.fim), q = eq(pl.eq); dica = `${u.nome}\nPrevisão: ${fSem(s.d)} · ${TURNO[s.t]}\n${q ? q.nome : ''}${S.fixos[u.id] ? ' (reservado)' : ''}`; }
     else dica = `${u.nome}\nSem previsão`;
     return `<button class="${cls}" ${est} data-a="unidade" data-u="${u.id}" data-dica="${esc(dica)}">${rot}</button>`;
   };
-  return [...S.pavs].sort((a, b) => b.n - a.n).map(p => {
+  const linhas = [...S.pavs].sort((a, b) => b.n - a.n).map(p => {
     const info = R.pav[p.n], us = c.unidades.filter(u => u.pav === p.n), pc = info.tot ? info.feitos / info.tot * 100 : 0;
     const aptos = us.filter(u => u.tipo === 'apto'), hall = us.find(u => u.tipo === 'hall'), s = info.fimT ? c.cal.em(info.fimT) : null;
     const pv = info.feitos === info.tot ? `<span class="selo ok">✓ Liberado ${fCurta(s.d)}</span>` : info.incerto || !s ? '<span class="mudo">sem previsão</span>' : `libera <b>${fSem(s.d)}</b> · ${TURNO[s.t]}`;
@@ -95,6 +95,12 @@ function predio() {
       <div class="pg"><div class="barra ${pc === 100 ? 'ok' : ''}"><i style="width:${pc}%"></i></div><span class="dir">${num(pc)}%</span></div>
       <div class="pv">${pv}</div></div>`;
   }).join('');
+  // térreo: a recepção, uma unidade só
+  const r = c.porId.get('R'), fr = c.feito.get('R'), pr = prev && prev.plano.get('R'), sr = fr ? fr : pr ? c.cal.em(pr.fim) : null;
+  return linhas + `<div class="pav terreo"><div class="n">Térreo</div>
+    <div class="cels" style="grid-template-columns:repeat(${maxQ},minmax(0,1fr)) 6px minmax(0,1.5fr)">${cel(r)}</div>
+    <div class="pg"><div class="barra ${fr ? 'ok' : ''}"><i style="width:${fr ? 100 : 0}%"></i></div><span class="dir">${fr ? 100 : 0}%</span></div>
+    <div class="pv">${fr ? `<span class="selo ok">✓ Concluída ${fCurta(fr.d)}</span>` : sr ? `previsão <b>${fSem(sr.d)}</b> · ${TURNO[sr.t]}` : '<span class="mudo">sem previsão</span>'}</div></div>`;
 }
 
 /** Equipes da mais rápida para a mais lenta (dias reais por apartamento). */
