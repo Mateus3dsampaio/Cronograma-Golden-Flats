@@ -10,7 +10,7 @@
   .cel{font-size:0;height:22px}.cel.hall{font-size:0}
   .veredito{flex-wrap:wrap}.veredito .acoes{margin-left:0}
   .sl{grid-template-columns:70px 1fr 90px}.sl>:last-child{display:none}
-  .pg-kpis,.pg-baixo,.pg-eq,.terc-topo{grid-template-columns:1fr}.mod-pinceis{grid-template-columns:1fr 1fr}.mod-pav{grid-template-columns:40px 1fr}.mod-pav .rod{grid-column:1/-1;justify-content:flex-end}
+  .pg-kpis,.pg-baixo,.pg-eq{grid-template-columns:1fr}.terc-campos{grid-template-columns:1fr 1fr}.mod-pinceis{grid-template-columns:1fr 1fr}.mod-pav{grid-template-columns:40px 1fr}.mod-pav .rod{grid-column:1/-1;justify-content:flex-end}
   .ext-cab{flex-wrap:wrap}
 }
 @media (max-width:640px){.kpis,.form{grid-template-columns:1fr}.heroi{grid-template-columns:1fr;justify-items:center;text-align:center}#lugar-predio{width:min(100%,270px);height:360px;margin:0}}

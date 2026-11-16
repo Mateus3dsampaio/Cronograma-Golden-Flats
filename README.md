@@ -32,7 +32,7 @@ Roda no Railway: os dados ficam no servidor e aparecem iguais no celular e no co
 ## Valores provisórios (conferir em Configurações)
 - Distribuição dos apartamentos: 11 pavimentos com 14 e 6 com 13.
 - Meta de montagem por item (Configurações): 2 dias para cada modelo de apartamento, 1 para o hall e 18 para a recepção (estimativa do Mateus), que fica no fim da fila.
-- Salário mensal de uma equipe fixa: R$ 2.500 (informado pelo Mateus), usado só na conta de terceirização do Simulador.
+- Custo mensal de uma equipe fixa, além do percentual: montador R$ 2.500 (informado pelo Mateus) + ajudante R$ 1.621 (PROVISÓRIO: salário mínimo de 2026, o Mateus confere) + encargos (0% até ele informar). Usado só na conta de terceirização do Simulador.
 - Data de início: a próxima segunda-feira.
 
 ## Rodar no computador (para testar)

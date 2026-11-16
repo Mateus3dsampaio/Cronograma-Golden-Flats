@@ -2,6 +2,7 @@ import { app } from '../../nucleo/contexto.js';
 import { preverComN, equipesPara } from '/compartilhado/previsao.js';
 import { dn, fData, fCurta, num, plural, brl } from '/compartilhado/datas.js';
 import { cenariosTerceirizar } from '/compartilhado/terceirizar.js';
+import { custoMensalFixa } from '/compartilhado/pagamentos.js';
 import { diasApto } from '../formato.js';
 
 /** Aba Simulador: quantas equipes para terminar numa data, e o término para cada quantidade de equipes. */
@@ -34,7 +35,7 @@ const pc = v => num(v, 1) + '%';
 
 /** Cartão "Vale a pena trazer terceirizadas?": compara o custo da obra com e sem equipes a mais. */
 function terceirizar() {
-  const { S, R, sim } = app, pct = S.pag.pctTerc, C = cenariosTerceirizar(S, R, { salario: S.pag.salarioFixa, entrada: sim.entrada, pct });
+  const { S, R, sim } = app, pct = S.pag.pctTerc, mensal = custoMensalFixa(S), C = cenariosTerceirizar(S, R, { salario: mensal, entrada: sim.entrada, pct });
   if (!C.length) return '';
   const [base, ...mais] = C, uteis = mais.filter(x => x.pctMax != null), teto = uteis.length ? Math.min(...uteis.map(x => x.pctMax)) : null, apto = uteis.length ? Math.min(...uteis.map(x => x.porApto)) : null;
   const melhor = pct != null && uteis.length ? uteis.reduce((a, b) => b.saldo > a.saldo ? b : a) : null;
@@ -43,13 +44,16 @@ function terceirizar() {
       : `Vale a pena pagar à terceirizada <b>até ${pc(teto)} do valor da unidade</b>, perto de <b>${brl(apto)} por apartamento</b>. Abaixo disso a obra sai mais barata com terceirizadas; acima, sai mais cara. ${melhor ? (melhor.saldo > 0 ? `Pagando ${pc(pct)}, o melhor cenário é <b>+${melhor.k}</b>: sobram <b>${brl(melhor.saldo)}</b> e a obra termina em ${fData(melhor.fim)}.` : `Pagando ${pc(pct)} você <b>perde dinheiro</b> em qualquer cenário; o ganho é só de prazo.`) : ''}`;
   return `<div class="card terc"><div class="rot"><span>Vale a pena trazer terceirizadas?</span><span class="mudo" style="letter-spacing:0;text-transform:none;font-weight:500">supondo que montem no ritmo de uma equipe fixa · entram em ${fCurta(sim.entrada)}</span></div>
     <div class="terc-topo"><div class="veredito ${teto > 0 ? 'ok' : 'nt'}"><div class="ic">${teto > 0 ? '$' : 'i'}</div><div>${resumo}</div></div>
-      <label class="campo">Salário mensal de uma equipe fixa (R$)<input type="number" min="0" step="50" inputmode="decimal" data-pg="salario" value="${S.pag.salarioFixa}"></label>
-      <label class="campo">% que penso em pagar à terceirizada<input type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="opcional" data-pg="pct-terc" value="${pct ?? ''}"></label></div>
-    <div class="rolagem"><table class="tab terc-tab"><thead><tr><th>Terceirizadas a mais</th><th class="dir">Término</th><th class="dir">Salário das ${base.fixas} fixas</th><th class="dir">% das equipes de hoje</th><th class="dir">Economia</th><th class="dir">Pode pagar até</th>${pct != null ? `<th class="dir">Custo a ${pc(pct)}</th><th class="dir">Saldo</th>` : ''}</tr></thead>
+      <div class="terc-campos"><label class="campo">Salário do montador fixo (R$)<input type="number" min="0" step="50" inputmode="decimal" data-pg="salario" value="${S.pag.salarioFixa}"></label>
+        <label class="campo">Salário do ajudante (R$)<input type="number" min="0" step="50" inputmode="decimal" data-pg="ajudante" value="${S.pag.salarioAjudante}"></label>
+        <label class="campo">Encargos sobre os salários (%)<input type="number" min="0" max="200" step="1" inputmode="decimal" data-pg="encargos" value="${S.pag.encargos}"></label>
+        <label class="campo">% que penso em pagar à terceirizada<input type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="opcional" data-pg="pct-terc" value="${pct ?? ''}"></label></div>
+      <p class="mudo terc-custo">Cada equipe fixa custa <b>${brl(mensal)} por mês</b> (montador + ajudante${S.pag.encargos ? ' + ' + num(S.pag.encargos) + '% de encargos' : ''}) mais o percentual do que monta. Na terceirizada, ajudante e ferramenta são por conta dela: o custo é só o percentual combinado.</p></div>
+    <div class="rolagem"><table class="tab terc-tab"><thead><tr><th>Terceirizadas a mais</th><th class="dir">Término</th><th class="dir">Salários das ${base.fixas} fixas</th><th class="dir">% das equipes de hoje</th><th class="dir">Economia</th><th class="dir">Pode pagar até</th>${pct != null ? `<th class="dir">Custo a ${pc(pct)}</th><th class="dir">Saldo</th>` : ''}</tr></thead>
       <tbody>${C.map(x => `<tr class="${x === melhor && x.saldo > 0 ? 'melhor' : ''}"><td><b>${x.k ? '+' + x.k : 'Nenhuma (hoje)'}</b>${x.k ? `<small class="mudo">montam ${plural(x.nTerc, 'unidade', 'unidades')}</small>` : ''}</td>
         <td class="dir">${fData(x.fim)}${x.k ? `<small class="mudo">${plural(dn(x.fim) - dn(base.fim), 'dia', 'dias')}</small>` : ''}</td><td class="dir">${brl(x.salarios)}<small class="mudo">${num(x.meses, 1)} meses de obra</small></td><td class="dir">${brl(x.comissao)}</td>
         <td class="dir">${x.k ? '<b>' + brl(x.economia) + '</b>' : '—'}</td><td class="dir">${x.pctMax == null ? '—' : `<b>${pc(x.pctMax)}</b><small class="mudo">${brl(x.porApto)} por apto</small>`}</td>
         ${pct != null ? `<td class="dir">${x.k ? brl(x.custoTerc) : '—'}</td><td class="dir">${x.k ? `<span class="selo ${x.saldo > 0 ? 'ok' : 'al'}">${x.saldo > 0 ? 'sobra ' : 'falta '}${brl(Math.abs(x.saldo))}</span>` : '—'}</td>` : ''}</tr>`).join('')}</tbody></table></div>
-    <p class="mudo" style="margin-top:12px;font-size:12px"><b>Como eu calculo:</b> cada cenário usa a previsão do cronograma. "Salário das fixas" é o salário das equipes fixas pelos meses que ainda faltam de obra. "Economia" é o que você deixa de gastar com as equipes de hoje (menos meses de salário e menos percentual, porque a terceirizada monta parte das unidades). "Pode pagar até" é essa economia dividida pelo valor do que a terceirizada monta: é o ponto de empate.${base.aCombinar ? ' Equipes de hoje com pagamento "a combinar" entram com custo zero.' : ''}
+    <p class="mudo" style="margin-top:12px;font-size:12px"><b>Como eu calculo:</b> cada cenário usa a previsão do cronograma. "Salários das fixas" é o custo mensal das equipes fixas (montador e ajudante) pelos meses que ainda faltam de obra. "Economia" é o que você deixa de gastar com as equipes de hoje (menos meses de salário e menos percentual, porque a terceirizada monta parte das unidades). "Pode pagar até" é essa economia dividida pelo valor do que a terceirizada monta: é o ponto de empate.${base.aCombinar ? ' Equipes de hoje com pagamento "a combinar" entram com custo zero.' : ''}
       <br><b>O que a conta não enxerga:</b> o salário só é economia de verdade se a equipe fixa liberada antes for produzir em outro serviço da loja; se ela ficar parada, você paga o salário do mesmo jeito. Também ficam de fora o ganho de entregar antes (receber antes, evitar multa) e o risco de qualidade e retrabalho da terceirizada.</p></div>`;
 }

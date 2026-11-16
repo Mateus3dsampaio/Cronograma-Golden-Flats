@@ -21,10 +21,16 @@ const ITENS_CONTRATO = [
 ];
 
 /** Parte de pagamentos de uma obra nova. `modelos` = id do apartamento -> id do modelo (m1..m4). */
-/** Salário mensal de uma equipe fixa (informado pelo Mateus em 16/11/2026). Usado na conta "vale a pena terceirizar?". */
-export const SALARIO_FIXA = 2500;
+/**
+ * Custo mensal de uma equipe fixa, além do percentual (Mateus, 16/11/2026): montador R$ 2.500 + um ajudante com "um salário".
+ * SALARIO_AJUDANTE é PROVISÓRIO: usei o salário mínimo de 2026 (R$ 1.621); o Mateus confere na tela do Simulador.
+ * Na terceirizada, ajudante e ferramenta são por conta dela. Usado na conta "vale a pena terceirizar?".
+ */
+export const SALARIO_FIXA = 2500, SALARIO_AJUDANTE = 1621;
+/** Custo mensal de uma equipe fixa: montador + ajudante, com os encargos (%) por cima. */
+export const custoMensalFixa = S => (S.pag.salarioFixa + S.pag.salarioAjudante) * (1 + (S.pag.encargos || 0) / 100);
 
-export const pagPadrao = () => ({ itens: ITENS_CONTRATO.map(i => ({ ...i })), modelos: {}, salarioFixa: SALARIO_FIXA, pctTerc: null });
+export const pagPadrao = () => ({ itens: ITENS_CONTRATO.map(i => ({ ...i })), modelos: {}, salarioFixa: SALARIO_FIXA, salarioAjudante: SALARIO_AJUDANTE, encargos: 0, pctTerc: null });
 
 /** Como uma equipe é paga: percentual do valor da unidade ou valor fixo em reais por unidade. `null` = ainda a combinar. */
 export const pagEquipePadrao = tipo => ({ modo: 'pct', pct: tipo === 'fixa' ? PCT_FIXA : null, fixo: { apto: null, hall: null, recep: null } });
@@ -36,6 +42,8 @@ export function garantirPagamentos(S) {
   for (const p of ITENS_CONTRATO) if (!S.pag.itens.some(i => i.id === p.id)) S.pag.itens.push({ ...p });
   if (!S.pag.modelos) S.pag.modelos = {};
   if (S.pag.salarioFixa == null) S.pag.salarioFixa = SALARIO_FIXA;
+  if (S.pag.salarioAjudante == null) S.pag.salarioAjudante = SALARIO_AJUDANTE;
+  if (S.pag.encargos == null) S.pag.encargos = 0;
   if (S.pag.pctTerc === undefined) S.pag.pctTerc = null; // % que o Mateus pensa em pagar à terceirizada (simulação)
   // meta de dias por item: obra gravada antes dela herda os prazos gerais que já estavam em uso
   for (const i of S.pag.itens) if (!(i.dias > 0)) i.dias = i.tipo === 'apto' ? S.cfg.aptoDias : i.tipo === 'hall' ? S.cfg.hallDias : S.cfg.recepDias;

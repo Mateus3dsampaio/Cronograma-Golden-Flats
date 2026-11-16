@@ -77,7 +77,7 @@ test('obra antiga (sem pagamentos) é completada sem perder nada', () => {
   S.feitos['1-1'] = { d: '2026-11-20', t: 0, e: 'e1' };
   assert.ok(calcular(S, HOJE).fim); // a previsão funciona mesmo antes de completar
   garantirPagamentos(S);
-  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 18); assert.deepEqual(S.pag.itens.map(i => i.dias), [2, 2, 2, 2, 1, 18]); assert.equal(S.pag.salarioFixa, 2500); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
+  assert.equal(S.pag.itens.length, 6); assert.equal(S.cfg.recepDias, 18); assert.deepEqual(S.pag.itens.map(i => i.dias), [2, 2, 2, 2, 1, 18]); assert.equal(S.pag.salarioFixa, 2500); assert.equal(S.pag.salarioAjudante, 1621); assert.equal(S.pag.encargos, 0); assert.equal(S.equipes[0].pag.pct, 3); assert.ok(S.feitos['1-1']);
 });
 
 test('registro de atividades descreve mudanças de pagamento e a recepção', () => {
@@ -118,6 +118,10 @@ test('vale a pena terceirizar: o teto fica perto de salário + percentual da equ
   }
   const caro = cenariosTerceirizar(S, R, { salario: 2500, entrada: S.cfg.inicio, pct: 8, max: 2 });
   assert.ok(caro.slice(1).every(x => x.saldo < 0), 'pagando 8% a obra fica mais cara');
+  const { custoMensalFixa } = await import('../src/compartilhado/pagamentos.js');
+  assert.equal(custoMensalFixa(S), 4121); S.pag.encargos = 50; assert.equal(custoMensalFixa(S), 6181.5); S.pag.encargos = 0;
+  const comAjudante = cenariosTerceirizar(S, R, { salario: custoMensalFixa(S), entrada: S.cfg.inicio, max: 2 });
+  assert.ok(comAjudante.slice(1).every(x => x.pctMax > 6.5 && x.pctMax < 8), 'com o ajudante na conta o teto sobe para perto de 7%');
   const semSalario = cenariosTerceirizar(S, R, { salario: 0, entrada: S.cfg.inicio, max: 2 });
   assert.ok(semSalario.slice(1).every(x => Math.abs(x.pctMax - 3) < .01), 'sem salário, o teto é o mesmo percentual da fixa');
 });

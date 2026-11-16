@@ -199,8 +199,10 @@ button.selo{cursor:pointer}button.selo:hover{filter:brightness(1.2)}
 .metas{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 /* Simulador: vale a pena trazer terceirizadas? */
 .sim>.terc{grid-column:1/-1}
-.terc-topo{display:grid;grid-template-columns:1fr 230px 230px;gap:14px;align-items:end;margin-bottom:14px}
-.terc-topo .veredito{font-size:14px;align-self:stretch}
+.terc-topo{display:grid;gap:12px;margin-bottom:14px}
+.terc-topo .veredito{font-size:14px}
+.terc-campos{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:end}
+.terc-custo{font-size:13px}.terc-custo b{color:var(--texto)}
 .terc-tab td{white-space:nowrap}
 .terc-tab th,.terc-tab td{padding-left:10px;padding-right:10px}
 .terc-tab th{letter-spacing:.1em}
